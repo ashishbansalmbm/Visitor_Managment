@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}
+    <title>Schedules</title>
+
+    <style>
+        select {
+            border: none;
+            border-radius: 0px;
+            height: 40px;
+            background: #f9f9ff;
+            padding-left: 20px;
+            padding-right: 40px;
+        }
+
+        .errorlist li {
+            color: red;
+        }
+
+        #id_purpose::placeholder {
+        }
+    </style>
+
+{% endblock %}
+
+{% block body %}
+
+
+
+    <div class="container" style="padding-top: 150px; padding-bottom: 150px">
+        <form class="form-group" action="" method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+
+
+            {% if flag == 1 %}
+                <p>Schedule has been created Sucessfully!</p>
+                <a href="{% url 'visitor:schedule' %}">Add New Schedule</a>
+            {% else %}
+
+                {% for field in schedule_form %}
+                    <p>
+                        <bold>{{ field.errors }}</bold>
+                    </p>
+                    <div>
+                        <div class="col-lg-10 col-md-10">
+                            <div class="mt-10">
+                                <div class="row">
+
+                                    <div class="col-md-2 col-lg-2 text-capitalize mt-8 text-dark ">
+                                        {{ field.label_tag }}
+                                    </div>
+
+                                    <div class="col-md-6 col-lg-6">
+                                        {% render_field field class="form-control" placeholder=field.label %}
+                                    </div>
+
+                                    <div class="col-md-3 col-lg-3 mt-2 p-0">
+                                        {% if field.label == 'Visitor id' %}
+                                            <a href="{% url 'visitor:update_visitor' %}" onclick="window.open(this.href, 'mywin',
+'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" target="_blank" ><i class="fa fa-plus"></i></a>
+                                        {% endif %}
+                                    </div>
+
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                <br>
+                <br>
+                <div class="mt-10">
+                    <button type="submit" class="genric-btn success-border radius" style="margin-left: 150px">Update
+                    </button>
+                </div>
+
+
+                </form>
+                </div>
+
+            {% endif %}
+
+{% endblock %}
+
+{% block script %}
+
+{% endblock %}

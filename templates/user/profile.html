@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}
+<title>Profile</title>
+    <style>
+    p {
+        font-family: 'Montserrat', monospace;
+        font-size: 15px;
+    }
+    </style>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+    <div class="container" style="padding-top: 40px; padding-bottom: 150px">
+    <ul>
+    <div class="container">
+         <h1 class="float-left">Profile</h1>
+        <a href="{% url 'visitor:update_profile' %}" class="genric-btn success-border radius float-right">Update Profile</a>
+    </div>
+
+    <br>
+    <br>
+    <hr style="margin-bottom: 20px">
+
+        {% if profile.photo %}
+
+            <div class="col-md-4 float-right">
+                <a href="{{ profile.photo.url }}" class="img-pop-up">
+                    <div class="single-gallery-image" style="height:330px;background: url({{ profile.photo.url }});"></div></a>
+            </div>
+        {% endif %}
+        <p>Username: {{ user }}</p>
+        <p>{{ profile.get_type_display }}</p>
+        <p>Name: {{ user.get_full_name }}</p>
+        <p>Email: {{ user.email }}</p>
+        <p>{{ profile.get_gender_display }}</p>
+        <p>{{ profile.date_of_birth }}</p>
+        <p>{{ profile.get_blood_group_display }}</p>
+        <p>{{ profile.address }}</p>
+        <p>{{ profile.city }}</p>
+        <p>{{ profile.state }}</p>
+        <p>{{ profile.get_category_display}}</p>
+        <p>{{ profile.contact }}</p>
+    </ul>
+    </div>
+
+{% endblock %}

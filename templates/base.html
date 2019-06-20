@@ -7,11 +7,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.css' %}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 
     {% block title %}
         <title>Base</title>
     {% endblock %}
 
+<style>
+    a {
+        color: skyblue;
+    }
+</style>
 
 </head>
 <body>
@@ -32,8 +38,17 @@
                 <!--a href="">
                     <i class="fa fa-male"></i>
                     My Profile</a-->
+                <p style="color: white"> {{ request.user.get_full_name }}</p>
+                <p>
+                    <a href="{% url 'visitor:dashboard' %}">Dashboard</a>
+                    <a href="{% url 'visitor:view_profile' %}">View Profile  </a>
+
+            <a href="{% url 'visitor:schedule' %}">Create Schedule </a></p>
+            <a href="#"></a>
+
+
             {% else %}
-                <a href="#">
+                <a href="{% url 'visitor:register' %}">
                     <i class="fa fa-power-off"></i>
                     Register</a>
                 <a href="{% url 'login' %}">

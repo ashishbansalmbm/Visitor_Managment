@@ -1,5 +1,8 @@
-from django.shortcuts import render
-from .forms import RegistrationForm, UpdateUserForm, UpdateProfileFormVerified, UpdateProfileFormNotVerified
+from django.http import HttpResponse
+from django.shortcuts import render, redirect
+from .forms import RegistrationForm, UpdateUserForm, UpdateProfileFormVerified, UpdateProfileFormNotVerified, \
+    UpdateScheduleForm, UpdateVisitorForm
+from .models import Schedule
 
 
 # Create your views here.
@@ -29,6 +32,11 @@ def dashboard(request):
     return render(request, 'home/dashboard.html')
 
 
+def view_profile(request):
+    context = {'user': request.user, 'profile': request.user.profile}
+    return render(request, 'user/profile.html', context)
+
+
 def update_profile(request):
     if request.method == "POST":
         user_form = UpdateUserForm(request.POST, instance=request.user)
@@ -41,7 +49,7 @@ def update_profile(request):
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
-            return redirect('user:view_profile')
+            return redirect('visitor:view_profile')
 
     else:
         if request.user.profile.verified:
@@ -54,3 +62,47 @@ def update_profile(request):
     user = request.user
     context = {'user_form': user_form, 'profile_form': profile_form, 'profile': profile, 'user': user}
     return render(request, 'user/update_profile.html', context)
+
+
+def test(request):
+    if request.method == 'POST':
+        print("hello")
+        name = request.POST['name']
+        year = request.POST['year']
+        print(name, year)
+        user = Schedule.objects.raw
+        return HttpResponse("hello")
+    return render(request, 'home/test.html')
+
+
+#
+#   def visitor(request):
+#
+
+def schedule(request):
+
+    if request.method == "POST":
+        schedule_form = UpdateScheduleForm(request.POST)
+        if schedule_form.is_valid():
+            schedule_form.save()
+            flag = 1
+            return render(request, 'user/schedule.html', {'flag': flag})
+    else:
+        schedule_form = UpdateScheduleForm()
+    context = {'schedule_form': schedule_form}
+    return render(request, 'user/schedule.html', context)
+
+
+def update_visitor(request):
+    if request.method == "POST":
+        update_form = UpdateVisitorForm(request.POST)
+        if update_form.is_valid():
+            update_form.save()
+            flag = 1
+            return render(request, 'user/update_visitor.html', { 'flag': flag})
+        else:
+            return HttpResponse("<p>There is an error!</p>")
+    else:
+        update_form = UpdateVisitorForm()
+    context = {'update_form': update_form}
+    return render(request, 'user/update_visitor.html', context)

@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}
+    <title>Update</title>
+{% endblock %}
+{% block body %}
+
+
+    {% if flag == 1 %}
+    <p> Visitor Added Successfully!</p>
+        <button class="genric-btn success-border radius" onclick="window.opener.location.reload(); window.close()" style="margin-left: 150px">Close
+                    </button>
+    {% else %}
+    <form method="post">
+
+    {% csrf_token %}
+        {% for field in update_form %}
+        <p>
+                        <bold>{{ field.errors }}</bold>
+                    </p>
+                    <div>
+                        <div class="col-lg-10 col-md-10">
+                            <div class="mt-10">
+                                <div class="row">
+                                    <div class="col-md-2 col-lg-2 text-capitalize mt-8 text-dark ">
+                                        {{ field.label_tag }}
+                                    </div>
+
+                                    <div class="col-md-6 col-lg-6">
+                                        {% render_field field class="form-control" placeholder=field.label %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+        {% endfor %}
+
+                <div class="mt-10">
+                    <button type="submit" class="genric-btn success-border radius" style="margin-left: 150px">Update
+                    </button>
+                </div>
+    </form>
+
+    {% endif %}
+{% endblock %}
