@@ -13,4 +13,6 @@ urlpatterns = [
    # path('test/', views.test, name="test"),
     path('schedule/', views.schedule, name="schedule"),
     path('visitor/update/', views.update_visitor, name= "update_visitor"),
+    path('home/guard_homepage/',views.guard_homepage, name="guard_homepage"),
+    path('home/guard_homepage/visitor_entry/',views.visitor_profile, name="visitor_profile")
 ]

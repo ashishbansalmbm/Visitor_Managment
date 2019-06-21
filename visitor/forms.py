@@ -48,7 +48,6 @@ class UpdateProfileFormVerified(forms.ModelForm):
 
 
 class UpdateScheduleForm(forms.ModelForm):
-
     class Meta:
         model = Schedule
         exclude = ['approve']
@@ -58,3 +57,9 @@ class UpdateVisitorForm(forms.ModelForm):
     class Meta:
         model = Visitor
         exclude = ['photo']
+
+
+class VisitorEntryForm:
+    class Meta:
+        model = Visitor
+        fields = ['name', 'phone', 'gender', 'designation', 'photo']

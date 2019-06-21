@@ -1,8 +1,9 @@
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from .forms import RegistrationForm, UpdateUserForm, UpdateProfileFormVerified, UpdateProfileFormNotVerified, \
-    UpdateScheduleForm, UpdateVisitorForm
+    UpdateScheduleForm, UpdateVisitorForm, VisitorEntryForm
 from .models import Schedule
+import datetime
 
 
 # Create your views here.
@@ -70,7 +71,7 @@ def test(request):
         name = request.POST['name']
         year = request.POST['year']
         print(name, year)
-        user = Schedule.objects.raw
+
         return HttpResponse("hello")
     return render(request, 'home/test.html')
 
@@ -80,7 +81,6 @@ def test(request):
 #
 
 def schedule(request):
-
     if request.method == "POST":
         schedule_form = UpdateScheduleForm(request.POST)
         if schedule_form.is_valid():
@@ -99,10 +99,27 @@ def update_visitor(request):
         if update_form.is_valid():
             update_form.save()
             flag = 1
-            return render(request, 'user/update_visitor.html', { 'flag': flag})
+            return render(request, 'user/update_visitor.html', {'flag': flag})
         else:
             return HttpResponse("<p>There is an error!</p>")
     else:
         update_form = UpdateVisitorForm()
     context = {'update_form': update_form}
     return render(request, 'user/update_visitor.html', context)
+
+
+def filter_by_date(date):
+    return Schedule.filter(in_time__year=date.year,
+                           in_time__month=date.month,
+                           in_time__day=date.day)
+
+
+def guard_homepage(request):
+    user = Schedule.objects.raw('select * from visitor_Schedule where approve=0 and in_time >current_timestamp')
+    return render(request, 'home/guard_homepage.html', {'user': user})
+
+
+def visitor_profile(request):
+    visitor_form = VisitorEntryForm()
+    context = {'visitor_form': visitor_form}
+    return render(request, 'home/visitor_profile.html', context)
