@@ -78,7 +78,6 @@ class Schedule(models.Model):
                + str(self.allowed_days)
 
 
-
 class Visit(models.Model):
     schedule_id = models.ForeignKey(Schedule, on_delete=models.SET_NULL, null=True)
     in_time = models.DateTimeField(default=timezone.now)

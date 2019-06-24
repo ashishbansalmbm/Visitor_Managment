@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from .forms import RegistrationForm, UpdateUserForm, UpdateProfileFormVerified, UpdateProfileFormNotVerified, \
     UpdateScheduleForm, UpdateVisitorForm, VisitorEntryForm
-from .models import Schedule
+from .models import Schedule, Visitor, Visit
 import datetime
 
 
@@ -115,11 +115,26 @@ def filter_by_date(date):
 
 
 def guard_homepage(request):
-    user = Schedule.objects.raw('select * from visitor_Schedule where approve=0 and in_time >current_timestamp')
-    return render(request, 'home/guard_homepage.html', {'user': user})
+    if request.method == "POST":
+        input_id = request.POST["idnum"]
+        phone_num = request.POST["phone"]
+        profile = Visitor.objects.raw("select * from visitor_Visitor where phone = %s or id = %s",
+                                      [phone_num, input_id])
+        idn = profile[0].id
+        schedul = Schedule.objects.raw('select * from visitor_Schedule where  approve=1 and visitor_id_id=%s', [idn])
+        visitor_form = VisitorEntryForm()
+        context = {'visitor_form': visitor_form, 'profile': profile, 'schedul': schedul}
+        return render(request, 'home/visitor_profile.html', context)
+
+    user = Schedule.objects.raw('select * from visitor_Schedule where approve=1 and in_time >current_timestamp')
+    visitor = Visit.objects.raw('select * from visitor_Visit where in_time < current_timestamp and out_time = in_time')
+    return render(request, 'home/guard_homepage.html', {'user': user, 'visitor':visitor})
 
 
 def visitor_profile(request):
     visitor_form = VisitorEntryForm()
+    # visitor = Vi
     context = {'visitor_form': visitor_form}
     return render(request, 'home/visitor_profile.html', context)
+
+
