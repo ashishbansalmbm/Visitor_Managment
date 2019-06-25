@@ -148,4 +148,5 @@ def past_visitor(request):
     past_visitors = Schedule.objects.raw(
         'select * from visitor_Schedule as s,visitor_Visitor as v where s.in_time < current_timestamp and  s.requested_by_id = %s and v.id=s.visitor_id_id',
         [user])
+    print (past_visitors[0].photo)
     return render(request, 'home/past_visitor.html', {'past_visitors': past_visitors})
