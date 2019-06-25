@@ -29,10 +29,6 @@ def register(request):
     return render(request, 'registration/registration_form.html', {'form': form})
 
 
-def dashboard(request):
-    return render(request, 'home/dashboard.html')
-
-
 def view_profile(request):
     context = {'user': request.user, 'profile': request.user.profile}
     return render(request, 'user/profile.html', context)
@@ -128,13 +124,28 @@ def guard_homepage(request):
 
     user = Schedule.objects.raw('select * from visitor_Schedule where approve=1 and in_time >current_timestamp')
     visitor = Visit.objects.raw('select * from visitor_Visit where in_time < current_timestamp and out_time = in_time')
-    return render(request, 'home/guard_homepage.html', {'user': user, 'visitor':visitor})
+    return render(request, 'home/guard_homepage.html', {'user': user, 'visitor': visitor})
 
 
 def visitor_profile(request):
     visitor_form = VisitorEntryForm()
-    # visitor = Vi
     context = {'visitor_form': visitor_form}
     return render(request, 'home/visitor_profile.html', context)
 
 
+def dashboard(request):
+    user = request.user.id
+    upcoming_visitor = Schedule.objects.raw(
+        'select * from visitor_Schedule where in_time >current_timestamp  and approve=1 and requested_by_id = %s',
+        [user])
+    context = {'user': user, 'profile': request.user.profile, 'past_visitor': past_visitor,
+               'upcoming_visitor': upcoming_visitor}
+    return render(request, 'home/dashboard.html', context)
+
+
+def past_visitor(request):
+    user = request.user.id
+    past_visitors = Schedule.objects.raw(
+        'select * from visitor_Schedule as s,visitor_Visitor as v where s.in_time < current_timestamp and  s.requested_by_id = %s and v.id=s.visitor_id_id',
+        [user])
+    return render(request, 'home/past_visitor.html', {'past_visitors': past_visitors})

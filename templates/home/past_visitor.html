@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+    <title>Past Visitors</title>
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        {% for vr in past_visitors %}
+            {% if vr.photo %}
+
+                <div class="col-md-4 float-right">
+                    <a href="{{ vr.photo.url }}" class="img-pop-up">
+                            <div class="single-gallery-image"
+                                 style="height:330px;background: url({{ vr.photo.url }});"></div>
+                        </a>
+                </div>
+            {% endif %}
+            <dl>
+                <dt>Name: {{ vr.visitor_id }}</dt>
+                <dd>Purpose: {{ vr.purpose }}</dd>
+                <dd>Allowed Device: {{ vr.allowed_devices }}</dd>
+                <dd>In- Time: {{ vr.in_time }}</dd>
+                <dd>Out- Time: {{ vr.out_time }}</dd>
+                <dd>Allowed Days: {{ vr.allowed_days }}</dd>
+                <dd>Meeting Place: {{ vr.meeting_place }}</dd>
+                <dd>Phone: {{ vr.phone }}</dd>
+                <dd>E-mail: {{ vr.email }}</dd>
+                <dd>Designation: {{ vr.designation }}</dd>
+            </dl>
+        {% endfor %}
+    </div>
+{% endblock %}

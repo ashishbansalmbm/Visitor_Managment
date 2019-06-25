@@ -1,14 +1,57 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}
-<title>Dashboard</title>
+    <title>Dashboard</title>
 {% endblock %}
 
 {% block body %}
-    <div class="container" style="margin-top: 2rem">
+    <div class="row">
+        <div class=" col-md-3 col-lg-3 card text-white bg-info mb-3 "
+             style="max-width: 20rem; margin-top:3rem; margin-left:2rem;">
+            <div class="card-header">Profile</div>
+            <div class="card-body">
+                {% if profile.photo %}
+
+                    <div class="col-md-4 float-right">
+                        <a href="{{ profile.photo.url }}" class="img-pop-up">
+                            <div class="single-gallery-image"
+                                 style="height:330px;background: url({{ profile.photo.url }});"></div>
+                        </a>
+                    </div>
+                {% endif %}
+                <p>Username: {{ user }}</p>
+                <p>{{ profile.get_type_display }}</p>
+                <p>Name: {{ user.get_full_name }}</p>
+                <p>Email: {{ user.email }}</p>
+                <p>{{ profile.get_gender_display }}</p>
+                <p>{{ profile.date_of_birth }}</p>
+                <p>{{ profile.get_blood_group_display }}</p>
+                <p>{{ profile.address }}</p>
+                <p>{{ profile.city }}</p>
+                <p>{{ profile.state }}</p>
+                <p>{{ profile.get_category_display }}</p>
+                <p>{{ profile.contact }}</p>
+            </div>
+        </div>
 
 
+        <div class="col-6">
+            <br>
+            <a href="{% url 'visitor:user_past_visitor' %}">1. Past Visitors</a><br>
+            <a href="{% url 'visitor:schedule' %}">2. Schedule new Visit</a><br>
+        </div>
 
-
+        <div class=" col-md-3 col-lg-3 card text-white bg-info mb-3 "
+             style="max-width: 20rem; margin-top:3rem; margin-left:2rem;">
+            <div class="card-header">Approved Schedule</div>
+            <div class="card-body">
+                {% for vr in upcoming_visitor %}
+                    <dl>
+                        <dt>{{ vr.visitor_id }}</dt>
+                        <dd> {{ vr.purpose }}</dd>
+                    </dl>
+                {% endfor %}
+            </div>
+        </div>
     </div>
 {% endblock %}
