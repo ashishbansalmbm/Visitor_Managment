@@ -1,6 +1,8 @@
+reportlab
 Django==2.2.2
 django-widget-tweaks==1.4.5
 Pillow==6.0.0
 pytz==2019.1
 sqlparse==0.3.0
 virtualenv==16.6.0
+weasyprint

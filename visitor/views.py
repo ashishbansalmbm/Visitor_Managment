@@ -3,7 +3,9 @@ from django.shortcuts import render, redirect
 from .forms import RegistrationForm, UpdateUserForm, UpdateProfileFormVerified, UpdateProfileFormNotVerified, \
     UpdateScheduleForm, UpdateVisitorForm, VisitorEntryForm
 from .models import Schedule, Visitor, Visit
-import datetime
+
+
+
 
 
 # Create your views here.
@@ -126,6 +128,8 @@ def guard_homepage(request):
     visitor = Visit.objects.raw('select * from visitor_Visit where in_time < current_timestamp and out_time = in_time')
     return render(request, 'home/guard_homepage.html', {'user': user, 'visitor': visitor})
 
+#def (request):
+#   if request.method == "POST":
 
 def visitor_profile(request):
     visitor_form = VisitorEntryForm()
@@ -138,7 +142,7 @@ def dashboard(request):
     upcoming_visitor = Schedule.objects.raw(
         'select * from visitor_Schedule where in_time >current_timestamp  and approve=1 and requested_by_id = %s',
         [user])
-    context = {'user': user, 'profile': request.user.profile, 'past_visitor': past_visitor,
+    context = {'user': user, 'profile': request.user.profile,
                'upcoming_visitor': upcoming_visitor}
     return render(request, 'home/dashboard.html', context)
 
@@ -149,3 +153,18 @@ def past_visitor(request):
         'select * from visitor_Schedule as s,visitor_Visitor as v where s.in_time < current_timestamp and  s.requested_by_id = %s and v.id=s.visitor_id_id',
         [user])
     return render(request, 'home/past_visitor.html', {'past_visitors': past_visitors})
+
+
+#ef html_to_pdf_view(request):
+#   paragraphs = ['first paragraph', 'second paragraph', 'third paragraph']
+#   html_string = render_to_string('home/pdf_template.html', {'paragraphs': paragraphs})
+
+#   html = HTML(string=html_string)
+#   html.write_pdf(target='/tmp/mypdf.pdf');
+
+#   fs = FileSystemStorage('/tmp')
+#   with fs.open('mypdf.pdf') as pdf:
+#       response = HttpResponse(pdf, content_type='application/pdf')
+#       response['Content-Disposition'] = 'attachment; filename="mypdf.pdf"'
+#       return response
+#   return response
