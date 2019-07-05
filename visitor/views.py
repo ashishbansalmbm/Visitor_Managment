@@ -43,8 +43,6 @@ def update_profile(request):
             profile_form = UpdateProfileFormVerified(request.POST, request.FILES, instance=request.user.profile)
         else:
             profile_form = UpdateProfileFormNotVerified(request.POST, request.FILES, instance=request.user.profile)
-        # print(user_form.errors.as_data())
-        # print(profile_form.errors.as_data())
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
@@ -113,7 +111,7 @@ def filter_by_date(date):
 
 
 def guard_homepage(request):
-    if request.method == "POST":
+    if request.POST['action'] == 'Send':
         input_id = request.POST["idnum"]
         phone_num = request.POST["phone"]
         profile = Visitor.objects.raw("select * from visitor_Visitor where phone = %s or id = %s",
@@ -123,6 +121,10 @@ def guard_homepage(request):
         visitor_form = VisitorEntryForm()
         context = {'visitor_form': visitor_form, 'profile': profile, 'schedul': schedul}
         return render(request, 'home/visitor_profile.html', context)
+
+    if request.POST['action'] == 'Snap':
+        pic = request.POST["photo"];
+        
 
     user = Schedule.objects.raw('select * from visitor_Schedule where approve=1 and in_time >current_timestamp')
     visitor = Visit.objects.raw('select * from visitor_Visit where in_time < current_timestamp and out_time = in_time')

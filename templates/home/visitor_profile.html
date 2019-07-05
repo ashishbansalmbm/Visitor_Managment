@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-
 {% block title %}
     <title xmlns="http://www.w3.org/1999/html">VisitorEntry</title>
     <style>
@@ -7,18 +6,17 @@
             font-family: 'Montserrat', monospace;
             font-size: 15px;
         }
-
     </style>
     <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
 {% endblock %}
 {% block head %}
-     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
      <script type="text/javascript">
         $("#btnPrint").live("click", function () {
             var divContents = $("#dvContainer").html();
             var printWindow = window.open('', '', 'height=400,width=800');
             printWindow.document.write('<html><head><title>DIV Contents</title>');
-            printWindow.document.write('</head><body >');
+            printWindow.document.write('</head><body>');
             printWindow.document.write(divContents);
             printWindow.document.write('</body></html>');
             printWindow.document.close();
@@ -29,32 +27,24 @@
 {% block body %}
     <div class="container" style="padding-top: 40px; padding-bottom: 150px">
         <ul>
-            <div class="container">
+            <div class="container" id="dvContainer" >
                 <h1 class="float-left">Profile</h1>
-
             </div>
-
             <br>
             <br>
             <hr style="margin-bottom: 20px">
             {% for profile in profile %}
-                <div class="card" style="width:400px" >
+                <div class="card" style="width:400px">
                     {% if profile.photo %}
                         <div class="col-md-4 float-right">
-                            <a href="{{ profile.photo.url }}" class="img">
-                                <div class="image"
-                                     style="height:330px; width:370px;background: url({{ profile.photo.url }});"></div>
-                            </a>
+                            <img src="{{ profile.photo.url }}"  style="height:330px; width:370px;">
                         </div>
                     {% else %}
-                        <button>
-                            take a snapshot
-                        </button>
+                       <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit" name="action" value="Snap">Take snapshot</button>
                         <video></video>
                     {% endif %}
-
-                    <div class="card-body" id="dvContainer">
-                        <h4 class="card-title">International Space Research Organisation</h4>
+                    <div class="card-body" >
+                        <h4 class="card-title">Indian Space Research Organisation</h4>
                         <p class="card-text">Regional Remote Sensing Center West</p>
                         <p class="card-text"><b>Name:</b> {{ profile.name }}</p>
                         <p class="card-text"><b>Phone:</b>{{ profile.phone }}</p>
@@ -65,58 +55,55 @@
                             <p class="card-text"><b>Out-Time:</b> {{ schedule.out_time }}</p>
                         {% endfor %}
                     </div>
+                 <input type="button" value="Print Div Contents" id="btnPrint" >
                 </div>
-                <!--- print id button -->
-                <input type="button" value="Print ID" id="btnPrint" </input>
                 </ul>
                 </div>
             {% endfor %}
+        <script>
+            const vid = document.querySelector('video');
+            navigator.mediaDevices.getUserMedia({video: true}) // request cam
+                .then(stream => {
+                    vid.srcObject = stream; // don't use createObjectURL(MediaStream)
+                    return vid.play(); // returns a Promise
+                })
+                .then(() => { // enable the button
+                    const btn = document.querySelector('button');
+                    btn.disabled = false;
+                    btn.onclick = e => {
+                        takeASnap()
+                            .then(stopcam);
+                    };
+                });
+            function takeASnap() {
+                const canvas = document.createElement('canvas'); // create a canvas
+                const ctx = canvas.getContext('2d'); // get its context
+                canvas.width = vid.videoWidth; // set its size to the one of the video
+                canvas.height = vid.videoHeight;
+                ctx.drawImage(vid, 0, 0); // the video(
 
-    <script>
-        const vid = document.querySelector('video');
-        navigator.mediaDevices.getUserMedia({video: true}) // request cam
-            .then(stream => {
-                vid.srcObject = stream; // don't use createObjectURL(MediaStream)
-                return vid.play(); // returns a Promise
-            })
-            .then(() => { // enable the button
-                const btn = document.querySelector('button');
-                btn.disabled = false;
-                btn.onclick = e => {
-                    takeASnap()
-                        .then(download);
-                };
-            });
+                return new Promise((res) => {
+                    canvas.toBlob(res, 'image/jpeg'); // request a Blob from the canvas
+                });
+            }
+            function stopcam(blob){
+                  var photo = canvas.toDataURL('image/jpeg');
+                $.ajax({
+                    method: 'POST',
+                    url: '{% url 'visitor:guard_homepage' %}',
+                    data: {
+                        photo: photo
+                    }
+                });
 
-        function takeASnap() {
-            const canvas = document.createElement('canvas'); // create a canvas
-            const ctx = canvas.getContext('2d'); // get its context
-            canvas.width = vid.videoWidth; // set its size to the one of the video
-            canvas.height = vid.videoHeight;
-            ctx.drawImage(vid, 0, 0); // the video
-
-            return new Promise((res) => {
-                canvas.toBlob(res, 'image/jpeg'); // request a Blob from the canvas
-            });
-            var photo = canvas.toDataURL('image/jpeg');
-            $.ajax({
-                method: 'POST',
-                url: '{% url 'visitor:guard_homepage' %}',
-                data: {
-                    photo: photo
-                }
-            });
-        }
-
-
-        function download(blob) {
-            // uses the <a download> to download a Blob
-            let a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'screenshot.jpg';
-            document.body.appendChild(a);
-            a.click();
-        }
-    </script>
-
+            }
+            function download(blob) {
+                // uses the <a download> to download a Blob
+                let a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'screenshot.jpg';
+                document.body.appendChild(a);
+                a.click();
+            }
+        </script>
 {% endblock %}
