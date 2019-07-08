@@ -10,100 +10,138 @@
     <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
 {% endblock %}
 {% block head %}
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-     <script type="text/javascript">
-        $("#btnPrint").live("click", function () {
-            var divContents = $("#dvContainer").html();
-            var printWindow = window.open('', '', 'height=400,width=800');
-            printWindow.document.write('<html><head><title>DIV Contents</title>');
-            printWindow.document.write('</head><body>');
-            printWindow.document.write(divContents);
-            printWindow.document.write('</body></html>');
-            printWindow.document.close();
-            printWindow.print();
-        });
-    </script>
+
 {% endblock %}
+
 {% block body %}
-    <div class="container" style="padding-top: 40px; padding-bottom: 150px">
-        <ul>
-            <div class="container" id="dvContainer" >
-                <h1 class="float-left">Profile</h1>
-            </div>
-            <br>
-            <br>
-            <hr style="margin-bottom: 20px">
-            {% for profile in profile %}
-                <div class="card" style="width:400px">
-                    {% if profile.photo %}
-                        <div class="col-md-4 float-right">
-                            <img src="{{ profile.photo.url }}"  style="height:330px; width:370px;">
+
+    <div class="container">
+        <div class="float-right mt-5">
+            <video height="250px" width="250px"></video>
+        </div>
+
+        <div class="float-left" style="padding-top: 40px; padding-bottom: 150px">
+            <ul>
+                {% for profile in profile %}
+                    <div class="card" style="width:400px">
+                        {% if profile.photo %}
+                            <div class="col-md-4 float-right">
+                                <img src="{{ profile.photo.url }}" style="height:330px; width:370px;">
+                            </div>
+                        {% else %}
+                            <form method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <img id="snap" name="photo">
+                                <input type="file" hidden>
+                                <button type="submit" id="save" hidden>Save</button>
+                            </form>
+
+                            <canvas hidden></canvas>
+                            <div class="controls">
+                                <a href="#" id="delete-photo" title="Delete Photo" class="disabled"><i
+                                        class="material-icons">delete</i></a>
+                                <button type="button" id="take-photo" title="Take Photo"><i class="material-icons">camera_alt</i>
+                                </button>
+                                <a href="#" id="download-photo" download="selfie.png" title="Save Photo"
+                                   class="disabled"><i
+                                        class="material-icons">file_download</i></a>
+                            </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <h4 class="card-title">Indian Space Research Organisation</h4>
+                            <p class="card-text">Regional Remote Sensing Center West</p>
+                            <p class="card-text"><b>Name:</b> {{ profile.name }}</p>
+                            <p class="card-text"><b>Phone:</b>{{ profile.phone }}</p>
+                            {% for schedule in schedul %}
+                                <p class="card-text"><b>Purpose:</b> {{ schedule.purpose }}</p>
+                                <p class="card-text"><b>Allowed Devices:</b> {{ schedule.allowed_devices }}</p>
+                                <p class="card-text"><b>In-Time:</b> {{ schedule.in_time }}</p>
+                                <p class="card-text"><b>Out-Time:</b> {{ schedule.out_time }}</p>
+                            {% endfor %}
                         </div>
-                    {% else %}
-                       <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit" name="action" value="Snap">Take snapshot</button>
-                        <video></video>
-                    {% endif %}
-                    <div class="card-body" >
-                        <h4 class="card-title">Indian Space Research Organisation</h4>
-                        <p class="card-text">Regional Remote Sensing Center West</p>
-                        <p class="card-text"><b>Name:</b> {{ profile.name }}</p>
-                        <p class="card-text"><b>Phone:</b>{{ profile.phone }}</p>
-                        {% for schedule in schedul %}
-                            <p class="card-text"><b>Purpose:</b> {{ schedule.purpose }}</p>
-                            <p class="card-text"><b>Allowed Devices:</b> {{ schedule.allowed_devices }}</p>
-                            <p class="card-text"><b>In-Time:</b> {{ schedule.in_time }}</p>
-                            <p class="card-text"><b>Out-Time:</b> {{ schedule.out_time }}</p>
-                        {% endfor %}
+
                     </div>
-                 <input type="button" value="Print Div Contents" id="btnPrint" >
-                </div>
-                </ul>
-                </div>
-            {% endfor %}
-        <script>
-            const vid = document.querySelector('video');
-            navigator.mediaDevices.getUserMedia({video: true}) // request cam
-                .then(stream => {
-                    vid.srcObject = stream; // don't use createObjectURL(MediaStream)
-                    return vid.play(); // returns a Promise
-                })
-                .then(() => { // enable the button
-                    const btn = document.querySelector('button');
-                    btn.disabled = false;
-                    btn.onclick = e => {
-                        takeASnap()
-                            .then(stopcam);
-                    };
-                });
-            function takeASnap() {
-                const canvas = document.createElement('canvas'); // create a canvas
-                const ctx = canvas.getContext('2d'); // get its context
-                canvas.width = vid.videoWidth; // set its size to the one of the video
-                canvas.height = vid.videoHeight;
-                ctx.drawImage(vid, 0, 0); // the video(
+                    </ul>
+                    </div>
 
-                return new Promise((res) => {
-                    canvas.toBlob(res, 'image/jpeg'); // request a Blob from the canvas
-                });
+                    </div>
+
+
+                {% endfor %}
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+    <script>
+        const vid = document.querySelector('video');
+        navigator.mediaDevices.getUserMedia({video: true}) // request cam
+            .then(stream => {
+                vid.srcObject = stream; // don't use createObjectURL(MediaStream)
+                return vid.play(); // returns a Promise
+            })
+            .then(() => { // enable the button
+                const btn = document.getElementById('take-photo');
+                btn.disabled = false;
+                btn.onclick = e => {
+                    var snap = takeASnap();
+                    image = document.querySelector('#snap');
+                    image.setAttribute('src', snap);
+                    document.querySelector('#save').removeAttribute('hidden');
+                };
+                const bt = document.getElementById('save');
+                bt.onclick = f => {
+                    var save = saveImage();
+                };
+            });
+
+
+        function takeASnap() {
+            const canvas = document.querySelector('canvas'), // create a canvas
+                context = canvas.getContext('2d'); // get its context
+
+            var width = vid.videoWidth, // set its size to the one of the video
+                height = vid.videoHeight;
+            if (width && height) {
+
+                // Setup a canvas with the same dimensions as the video.
+                canvas.width = width;
+                canvas.height = height;
+
+                // Make a copy of the current frame in the video on the canvas.
+                context.drawImage(vid, 0, 0, width, height);
+
+                // Turn the canvas image into a dataURL that can be used as a src for our photo.
+                return canvas.toDataURL('image/png');
             }
-            function stopcam(blob){
-                  var photo = canvas.toDataURL('image/jpeg');
+        }
+
+        function saveImage() {
+            alert('hi');
+            {#const canvas = document.querySelector('canvas');#}
+            {#var photo = canvas.toDataURL('image/png');#}
+            var imageData = document.getElementById('snap').src;
+            var fd = new FormData();
+            fd.append("image", imageData);
+            $("#save").click(function (e) {
+                e.preventDefault();
                 $.ajax({
-                    method: 'POST',
-                    url: '{% url 'visitor:guard_homepage' %}',
-                    data: {
-                        photo: photo
-                    }
+                    url: "/user/home/guard_homepage/",
+                    type: "POST",
+                    headers: {'X-CSRFToken': $.cookie("csrftoken")},
+                    data: fd,
+                    processData: false,
+                    contentType: 'multipart/form-data',
                 });
+            });
+        };
 
-            }
-            function download(blob) {
-                // uses the <a download> to download a Blob
-                let a = document.createElement('a');
-                a.href = URL.createObjectURL(blob);
-                a.download = 'screenshot.jpg';
-                document.body.appendChild(a);
-                a.click();
-            }
-        </script>
+
+        function download(blob) {
+            // uses the <a download> to download a Blob
+            let a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'screenshot.jpg';
+            document.body.appendChild(a);
+            a.click();
+        }
+    </script>
 {% endblock %}

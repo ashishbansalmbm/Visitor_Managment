@@ -1,11 +1,14 @@
+from django.core.files.base import ContentFile
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
+
+import base64
+
+from django.views.decorators.csrf import csrf_exempt
+
 from .forms import RegistrationForm, UpdateUserForm, UpdateProfileFormVerified, UpdateProfileFormNotVerified, \
     UpdateScheduleForm, UpdateVisitorForm, VisitorEntryForm
 from .models import Schedule, Visitor, Visit
-
-
-
 
 
 # Create your views here.
@@ -109,28 +112,58 @@ def filter_by_date(date):
                            in_time__month=date.month,
                            in_time__day=date.day)
 
-
+@csrf_exempt
 def guard_homepage(request):
-    if request.POST['action'] == 'Send':
-        input_id = request.POST["idnum"]
-        phone_num = request.POST["phone"]
-        profile = Visitor.objects.raw("select * from visitor_Visitor where phone = %s or id = %s",
-                                      [phone_num, input_id])
-        idn = profile[0].id
-        schedul = Schedule.objects.raw('select * from visitor_Schedule where  approve=1 and visitor_id_id=%s', [idn])
-        visitor_form = VisitorEntryForm()
-        context = {'visitor_form': visitor_form, 'profile': profile, 'schedul': schedul}
-        return render(request, 'home/visitor_profile.html', context)
 
-    if request.POST['action'] == 'Snap':
-        pic = request.POST["photo"];
-        
+    if request.method == 'POST':
+        id = -1
+        print("hello")
+        try:
+            if request.POST['action']:
+                print('action')
+                input_id = request.POST["idnum"]
+                phone_num = request.POST["phone"]
+                profile = Visitor.objects.raw("select * from visitor_Visitor where phone = %s or id = %s",
+                                              [phone_num, input_id])
+                idn = profile[0].id
+                id = idn
+                schedul = Schedule.objects.raw('select * from visitor_Schedule where  approve=1 and visitor_id_id=%s',
+                                               [idn])
+                visitor_form = VisitorEntryForm()
+                context = {'visitor_form': visitor_form, 'profile': profile, 'schedul': schedul}
+                return render(request, 'home/visitor_profile.html', context)
+
+        except:
+            print('haan')
+            image_data = request.POST.get("image")
+            print(str(image_data))
+            format, imgstr = image_data.split(';base64,')
+            file_name = '.'.join(('image', 'png'))
+            data = ContentFile(base64.b64decode(imgstr), name=file_name)
+            profile = Visitor.objects.get(pk=3)
+            profile.photo = data
+            profile.save()
+            return render(request, 'home/visitor_profile.html')
+        else:
+            print('hi')
+
+    # if request.POST['action'] == 'Snap':
+    #     pic = request.POST["photo"];
+    # if request.POST['action'] == 'Snap':
+    #    pic = request.POST["photo"]
+    #    image_data = base64.b64decode(pic[22:] + b'=' * (-len(pic[22:]) % 4))
+    #    imagene = ContentFile(image_data, 'imagen1.png')
+    #    profile = Visitor.objects.raw("select * from visitor_Visitor where phone = %s or id = %s",
+    #                                  [phone_num, input_id])
+    #    profile.photo = imagene
+    #    profile.save()
 
     user = Schedule.objects.raw('select * from visitor_Schedule where approve=1 and in_time >current_timestamp')
     visitor = Visit.objects.raw('select * from visitor_Visit where in_time < current_timestamp and out_time = in_time')
     return render(request, 'home/guard_homepage.html', {'user': user, 'visitor': visitor})
 
-#def (request):
+
+# def (request):
 #   if request.method == "POST":
 
 def visitor_profile(request):
@@ -156,8 +189,7 @@ def past_visitor(request):
         [user])
     return render(request, 'home/past_visitor.html', {'past_visitors': past_visitors})
 
-
-#ef html_to_pdf_view(request):
+# ef html_to_pdf_view(request):
 #   paragraphs = ['first paragraph', 'second paragraph', 'third paragraph']
 #   html_string = render_to_string('home/pdf_template.html', {'paragraphs': paragraphs})
 
