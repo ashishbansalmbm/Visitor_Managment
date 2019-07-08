@@ -5,9 +5,6 @@ from .forms import RegistrationForm, UpdateUserForm, UpdateProfileFormVerified, 
 from .models import Schedule, Visitor, Visit
 
 
-
-
-
 # Create your views here.
 
 def register(request):
@@ -128,7 +125,8 @@ def guard_homepage(request):
     visitor = Visit.objects.raw('select * from visitor_Visit where in_time < current_timestamp and out_time = in_time')
     return render(request, 'home/guard_homepage.html', {'user': user, 'visitor': visitor})
 
-#def (request):
+
+# def (request):
 #   if request.method == "POST":
 
 def visitor_profile(request):
@@ -154,8 +152,7 @@ def past_visitor(request):
         [user])
     return render(request, 'home/past_visitor.html', {'past_visitors': past_visitors})
 
-
-#ef html_to_pdf_view(request):
+# ef html_to_pdf_view(request):
 #   paragraphs = ['first paragraph', 'second paragraph', 'third paragraph']
 #   html_string = render_to_string('home/pdf_template.html', {'paragraphs': paragraphs})
 
