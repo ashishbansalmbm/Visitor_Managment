@@ -55,7 +55,7 @@ class Visitor(models.Model):
     email = models.EmailField(max_length=254, null=True, blank=True)
     address = models.TextField(blank=True, null=True)
     profile_creation_time = models.DateTimeField(auto_now_add=True)
-    photo = models.ImageField(upload_to='Visitors', blank=True, null=True)
+    photo = models.ImageField(upload_to='visitors', blank=True, null=True)
 
     def __str__(self):
         return self.name

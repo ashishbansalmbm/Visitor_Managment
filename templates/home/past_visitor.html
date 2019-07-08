@@ -8,13 +8,10 @@
     <div class="container">
         {% for vr in past_visitors %}
             {% if vr.photo %}
-
                 <div class="col-md-4 float-right">
-                    <a href="{{ vr.photo.url }}" class="img-pop-up">
-                            <div class="single-gallery-image"
-                                 style="height:330px;background: url({{ vr.photo.url}});"></div>
-                        </a>
-                </div>
+                <a href="/media/{{ vr.photo }}" class="img-pop-up">
+                    <div class="single-gallery-image" style="height:330px;background: url(/media/{{ vr.photo }});"></div></a>
+            </div>
             {% endif %}
             <dl>
                 <dt>Name: {{ vr.visitor_id }}</dt>
