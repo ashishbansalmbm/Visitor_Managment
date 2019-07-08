@@ -121,7 +121,7 @@ def guard_homepage(request):
                 profile = Visitor.objects.raw("select * from visitor_Visitor where phone = %s or id = %s",
                                               [phone_num, input_id])
                 idn = profile[0].id
-                schedul = Schedule.objects.raw('select * from visitor_Schedule where  approve=1 and visitor_id_id=%s',
+                schedul = Schedule.objects.raw('select * from visitor_Schedule where  approve=1 and visitor_id_id=%s and in_time > current_timestamp ',
                                                [idn])
                 visitor_form = VisitorEntryForm()
                 context = {'visitor_form': visitor_form, 'profile': profile, 'schedul': schedul}
@@ -180,6 +180,8 @@ def past_visitor(request):
         'select * from visitor_Schedule as s,visitor_Visitor as v where s.in_time < current_timestamp and  s.requested_by_id = %s and v.id=s.visitor_id_id',
         [user])
     return render(request, 'home/past_visitor.html', {'past_visitors': past_visitors})
+
+
 
 # ef html_to_pdf_view(request):
 #   paragraphs = ['first paragraph', 'second paragraph', 'third paragraph']

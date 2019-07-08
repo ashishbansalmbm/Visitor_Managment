@@ -15,6 +15,7 @@
 
 {% block body %}
 
+
     <div class="container">
         <div class="float-right mt-5">
             <video height="250px" width="250px"></video>
@@ -43,16 +44,21 @@
                             </div>
                         {% endif %}
                         <div class="card-body">
+                        <div id="qrcode"></div>
                             <h4 class="card-title">Indian Space Research Organisation</h4>
                             <p class="card-text">Regional Remote Sensing Center West</p>
-                            <p class="card-text"><b>Name:</b> {{ profile.name }}</p>
+                            <b>Name:</b>
+                            <p class="card-text" id="name">{{ profile.name }}</p>
                             <p class="card-text"><b>Phone:</b>{{ profile.phone }}</p>
                             {% for schedule in schedul %}
                                 <p class="card-text"><b>Purpose:</b> {{ schedule.purpose }}</p>
                                 <p class="card-text"><b>Allowed Devices:</b> {{ schedule.allowed_devices }}</p>
-                                <p class="card-text"><b>In-Time:</b> {{ schedule.in_time }}</p>
-                                <p class="card-text"><b>Out-Time:</b> {{ schedule.out_time }}</p>
+                                <b>In-Time:</b>
+                                <p class="card-text" id="in_time">{{ schedule.in_time }}</p>
+                                <b>Out-Time:</b>
+                                <p class="card-text" id="out_time">{{ schedule.out_time }}</p>
                             {% endfor %}
+                            <button type="button" id="qr" onclick="showqr()">View-QR</button>
                         </div>
 
                     </div>
@@ -64,7 +70,9 @@
 
                 {% endfor %}
 
-    {% block script %}
+{% endblock %}
+
+{% block script %}
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
     <script>
         const vid = document.querySelector('video');
@@ -88,7 +96,7 @@
                         type: "POST",
                         url: "/user/home/guard_homepage/",
                         data: {
-                            photo:snap,
+                            photo: snap,
                             pk: pk,
                             csrfmiddlewaretoken: '{{ csrf_token }}',
                         },
@@ -135,7 +143,22 @@
         {#    a.download = 'screenshot.jpg';#}
         {#    document.body.appendChild(a);#}
         {#    a.click();#}
-        {#}#}
+
+
+        function showqr() {
+            var data = document.getElementById('name').innerHTML;
+            data = data + document.getElementById('in_time').innerHTML;
+            data = data + document.getElementById('out_time').innerHTML;
+            var qrcode = new QRCode(document.getElementById("qrcode"), {
+                text: data,
+                width: 128,
+                height: 128,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        }
+
+
     </script>
-        {% endblock %}
 {% endblock %}
