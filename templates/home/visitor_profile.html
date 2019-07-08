@@ -29,22 +29,17 @@
                                 <img src="{{ profile.photo.url }}" style="height:330px; width:370px;">
                             </div>
                         {% else %}
-                            <form method="POST" enctype="multipart/form-data">
-                                {% csrf_token %}
-                                <img id="snap" name="photo">
-                                <input type="file" hidden>
-                                <button type="submit" id="save" hidden>Save</button>
-                            </form>
+                            <canvas id="snapshot" width="250px" height="250px"></canvas>
+                            <input type="number" hidden id='pk' value={{ profile.id }}>
 
-                            <canvas hidden></canvas>
                             <div class="controls">
                                 <a href="#" id="delete-photo" title="Delete Photo" class="disabled"><i
                                         class="material-icons">delete</i></a>
-                                <button type="button" id="take-photo" title="Take Photo"><i class="material-icons">camera_alt</i>
+                                <button type="button" id="take-photo" title="Take Photo"><i class="material-icons">Capture</i>
                                 </button>
-                                <a href="#" id="download-photo" download="selfie.png" title="Save Photo"
+                                <a href="#" id="save-photo" title="Save Photo"
                                    class="disabled"><i
-                                        class="material-icons">file_download</i></a>
+                                        class="material-icons">Save</i></a>
                             </div>
                         {% endif %}
                         <div class="card-body">
@@ -68,9 +63,9 @@
 
 
                 {% endfor %}
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script type="text/javascript"
-            src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+
+    {% block script %}
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
     <script>
         const vid = document.querySelector('video');
         navigator.mediaDevices.getUserMedia({video: true}) // request cam
@@ -80,16 +75,25 @@
             })
             .then(() => { // enable the button
                 const btn = document.getElementById('take-photo');
+                var snap;
                 btn.disabled = false;
                 btn.onclick = e => {
-                    var snap = takeASnap();
-                    image = document.querySelector('#snap');
-                    image.setAttribute('src', snap);
-                    document.querySelector('#save').removeAttribute('hidden');
+                    snap = takeASnap();
                 };
-                const bt = document.getElementById('save');
+                const bt = document.getElementById('save-photo');
                 bt.onclick = f => {
-                    var save = saveImage();
+                    var pk = document.getElementById('pk');
+                    pk = pk.value;
+                    $.ajax({
+                        type: "POST",
+                        url: "/user/home/guard_homepage/",
+                        data: {
+                            photo:snap,
+                            pk: pk,
+                            csrfmiddlewaretoken: '{{ csrf_token }}',
+                        },
+
+                    });
                 };
             });
 
@@ -114,34 +118,24 @@
             }
         }
 
-        function saveImage() {
-            alert('hi');
-            {#const canvas = document.querySelector('canvas');#}
-            {#var photo = canvas.toDataURL('image/png');#}
-            var imageData = document.getElementById('snap').src;
-            var fd = new FormData();
-            fd.append("image", imageData);
-            $("#save").click(function (e) {
-                e.preventDefault();
-                $.ajax({
-                    url: "/user/home/guard_homepage/",
-                    type: "POST",
-                    headers: {'X-CSRFToken': $.cookie("csrftoken")},
-                    data: fd,
-                    processData: false,
-                    contentType: 'multipart/form-data',
-                });
-            });
-        };
+        {#function saveImage(snap) {#}
+        {#         alert('hi');#}
+        {#        $.ajax({#}
+        {#            url: "/user/home/guard_homepage/",#}
+        {#            type: "POST",#}
+        {#            data: snap,#}
+        {#        });#}
+        {#    }#}
 
 
-        function download(blob) {
-            // uses the <a download> to download a Blob
-            let a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'screenshot.jpg';
-            document.body.appendChild(a);
-            a.click();
-        }
+        {#function download(blob) {#}
+        {#    // uses the <a download> to download a Blob#}
+        {#    let a = document.createElement('a');#}
+        {#    a.href = URL.createObjectURL(blob);#}
+        {#    a.download = 'screenshot.jpg';#}
+        {#    document.body.appendChild(a);#}
+        {#    a.click();#}
+        {#}#}
     </script>
+        {% endblock %}
 {% endblock %}

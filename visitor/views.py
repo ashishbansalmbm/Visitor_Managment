@@ -1,15 +1,14 @@
-from django.core.files.base import ContentFile
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
 import base64
 
-
-from django.views.decorators.csrf import csrf_exempt
+from django.core.files.base import ContentFile
 
 from .forms import RegistrationForm, UpdateUserForm, UpdateProfileFormVerified, UpdateProfileFormNotVerified, \
     UpdateScheduleForm, UpdateVisitorForm, VisitorEntryForm
 from .models import Schedule, Visitor, Visit
+
 
 # Create your views here.
 
@@ -112,21 +111,16 @@ def filter_by_date(date):
                            in_time__month=date.month,
                            in_time__day=date.day)
 
-@csrf_exempt
-def guard_homepage(request):
 
+def guard_homepage(request):
     if request.method == 'POST':
-        id = -1
-        print("hello")
         try:
             if request.POST['action']:
-                print('action')
                 input_id = request.POST["idnum"]
                 phone_num = request.POST["phone"]
                 profile = Visitor.objects.raw("select * from visitor_Visitor where phone = %s or id = %s",
                                               [phone_num, input_id])
                 idn = profile[0].id
-                id = idn
                 schedul = Schedule.objects.raw('select * from visitor_Schedule where  approve=1 and visitor_id_id=%s',
                                                [idn])
                 visitor_form = VisitorEntryForm()
@@ -134,18 +128,16 @@ def guard_homepage(request):
                 return render(request, 'home/visitor_profile.html', context)
 
         except:
-            print('haan')
-            image_data = request.POST.get("image")
-            print(str(image_data))
-            format, imgstr = image_data.split(';base64,')
-            file_name = '.'.join(('image', 'png'))
-            data = ContentFile(base64.b64decode(imgstr), name=file_name)
-            profile = Visitor.objects.get(pk=3)
-            profile.photo = data
-            profile.save()
-            return render(request, 'home/visitor_profile.html')
-        else:
-            print('hi')
+            if request.POST.get("photo"):
+                pic = request.POST.get("photo")
+                pk = request.POST.get('pk')
+                format, imgstr = pic.split(';base64,')
+                ext = format.split('/')[-1]
+                data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
+                profile = Visitor.objects.get(pk=pk)
+                profile.photo = data
+                profile.save()
+                return render(request, 'home/visitor_profile.html')
 
     # if request.POST['action'] == 'Snap':
     #     pic = request.POST["photo"];
