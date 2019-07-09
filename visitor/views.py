@@ -121,8 +121,9 @@ def guard_homepage(request):
                 profile = Visitor.objects.raw("select * from visitor_Visitor where phone = %s or id = %s",
                                               [phone_num, input_id])
                 idn = profile[0].id
-                schedul = Schedule.objects.raw('select * from visitor_Schedule where  approve=1 and visitor_id_id=%s and in_time > current_timestamp ',
-                                               [idn])
+                schedul = Schedule.objects.raw(
+                    'select * from visitor_Schedule where  approve=1 and visitor_id_id=%s and in_time > current_timestamp ',
+                    [idn])
                 visitor_form = VisitorEntryForm()
                 context = {'visitor_form': visitor_form, 'profile': profile, 'schedul': schedul}
                 return render(request, 'home/visitor_profile.html', context)
@@ -182,7 +183,6 @@ def past_visitor(request):
     return render(request, 'home/past_visitor.html', {'past_visitors': past_visitors})
 
 
-
 # ef html_to_pdf_view(request):
 #   paragraphs = ['first paragraph', 'second paragraph', 'third paragraph']
 #   html_string = render_to_string('home/pdf_template.html', {'paragraphs': paragraphs})
@@ -196,3 +196,6 @@ def past_visitor(request):
 #       response['Content-Disposition'] = 'attachment; filename="mypdf.pdf"'
 #       return response
 #   return response
+
+def scan_qr(request):
+    return render(request, 'user/scan.html')

@@ -16,5 +16,6 @@ urlpatterns = [
     path('visitor/update/', views.update_visitor, name="update_visitor"),
     path('home/guard_homepage/', views.guard_homepage, name="guard_homepage"),
     path('home/guard_homepage/visitor_entry/', views.visitor_profile, name="visitor_profile"),
+    path('scan/qr/', views.scan_qr, name="scan-qr"),
    # path('home/view/',views.html_to_pdf_view,name="html_to_pdf_view"),
 ]

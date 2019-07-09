@@ -6,6 +6,16 @@
             font-family: 'Montserrat', monospace;
             font-size: 15px;
         }
+
+        @media print {
+            .noprint {
+                display: none;
+            }
+        }
+
+        @media screen {
+            ...
+        }
     </style>
     <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
 {% endblock %}
@@ -16,15 +26,12 @@
 {% block body %}
 
 
-    <div class="container">
-        <div class="float-right mt-5">
-            <video height="250px" width="250px"></video>
-        </div>
+    <div class="container row">
 
-        <div class="float-left" style="padding-top: 40px; padding-bottom: 150px">
+        <div class="mt-5 col-lg-6 offset-2 ">
             <ul>
                 {% for profile in profile %}
-                    <div class="card" style="width:400px">
+                    <div class="card" id="printable" style="width:400px">
                         {% if profile.photo %}
                             <div class="col-md-4 float-right">
                                 <img src="{{ profile.photo.url }}" style="height:330px; width:370px;">
@@ -44,7 +51,7 @@
                             </div>
                         {% endif %}
                         <div class="card-body">
-                        <div id="qrcode"></div>
+                            <div id="qrcode"></div>
                             <h4 class="card-title">Indian Space Research Organisation</h4>
                             <p class="card-text">Regional Remote Sensing Center West</p>
                             <b>Name:</b>
@@ -58,14 +65,21 @@
                                 <b>Out-Time:</b>
                                 <p class="card-text" id="out_time">{{ schedule.out_time }}</p>
                             {% endfor %}
-                            <button type="button" id="qr" onclick="showqr()">View-QR</button>
+                            <button type="button" class="noprint" id="qr" onclick="showqr()">View-QR</button>
                         </div>
 
                     </div>
                     </ul>
                     </div>
 
+                     <div class="noprint mt-5 col">
+                        <video height="250px" width="250px"></video>
                     </div>
+                    </div>
+                    <div class="text-center">
+                        <button class="btn btn-light noprint" onclick="window.print()">Print</button>
+                    </div>
+
 
 
                 {% endfor %}

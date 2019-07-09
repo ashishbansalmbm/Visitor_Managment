@@ -28,7 +28,8 @@
                     <form method="post" class="form-signin">
                         {% csrf_token %}
                         <div class="form-label-group">
-                            <input type="tel" name="phone" pattern="[0-9]{10}" id="inputPhoneNumber" class="form-control"
+                            <input type="tel" name="phone" pattern="[0-9]{10}" id="inputPhoneNumber"
+                                   class="form-control"
                                    placeholder="Phone Number">
                             <label for="inputPhoneNumber">Phone Number</label>
                         </div>
@@ -37,9 +38,11 @@
                             <input type="text" name="idnum" id="inputId" class="form-control" placeholder="ID number">
                             <label for="inputId">ID number</label>
                         </div>
-                        <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit" name="action" value="Send">Scan QR
+                        <a class="btn btn-light" href="{% url 'visitor:scan-qr' %}">Scan QR
+                        </a>
+                        <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit" name="action"
+                                value="Send">VERIFY
                         </button>
-                        <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit" name="action" value="Send">VERIFY</button>
                     </form>
                 </div>
             </div>
@@ -50,10 +53,10 @@
             <div class="card-header">Visitors Inside</div>
             <div class="card-body">
                 {% for vr in visitor %}
-                <dl>
-                    <dt>{{ vr.schedule_id }}</dt>
-                    <dd> {{ vr.in_time }}</dd>
-                </dl>
+                    <dl>
+                        <dt>{{ vr.schedule_id }}</dt>
+                        <dd> {{ vr.in_time }}</dd>
+                    </dl>
                 {% endfor %}
             </div>
         </div>

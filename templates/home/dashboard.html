@@ -2,6 +2,26 @@
 {% load static %}
 {% block title %}
     <title>Dashboard</title>
+
+    <style>
+
+.circular--square {
+border-radius: 40px;
+  border-radius: 50%;
+  margin-left:-10px;
+}
+span {
+  background: white;
+  border-radius: 20px black;
+  font-size: 25px;
+  text-align: center;
+  margin-right: 10px;
+  border-radius:50%;
+  display:inline-block;
+  padding:10px;
+}
+
+</style>
 {% endblock %}
 
 {% block body %}
@@ -9,39 +29,62 @@
         <div class=" col-md-3 col-lg-3 card text-white bg-info mb-3 "
              style="max-width: 20rem; margin-top:3rem; margin-left:2rem;">
             <div class="card-header">Profile</div>
+
             <div class="card-body">
                 {% if profile.photo %}
 
-                    <div class="col-md-4 float-right">
-                        <a href="{{ profile.photo.url }}" class="img-pop-up">
-                            <div class="single-gallery-image"
-                                 style="height:330px;background: url({{ profile.photo.url }});"></div>
-                        </a>
-                    </div>
+                    <center>
+                        <div class="col-md-4 ">
+                            <a href="{{ profile.photo.url }}" class="img-pop-up">
+                                <img src="{{ profile.photo.url }}" class="circular--square" width="80" height="70"/>
+                            </a>
+                        </div>
+                    </center>
                 {% endif %}
+                <center><p><b>{{ request.user.get_full_name }}</b></p></center>
+                <p><i class="fa fa-envelope"> {{ request.user.email }}</i></p>
+                <p><i class="fa fa-phone">{{ profile.contact }}</i></p>
                 <p>Username: {{ user }}</p>
                 <p>{{ profile.get_type_display }}</p>
-                <p>Name: {{ user.get_full_name }}</p>
-                <p>Email: {{ user.email }}</p>
-                <p>{{ profile.get_gender_display }}</p>
-                <p>{{ profile.date_of_birth }}</p>
-                <p>{{ profile.get_blood_group_display }}</p>
-                <p>{{ profile.address }}</p>
-                <p>{{ profile.city }}</p>
-                <p>{{ profile.state }}</p>
-                <p>{{ profile.get_category_display }}</p>
-                <p>{{ profile.contact }}</p>
+
+                {% if profile.photo %}<p>Gender :{{ profile.get_gender_display }}</p> {% endif %}
+                {% if profile.photo %}<p>DOB: {{ profile.date_of_birth }}</p> {% endif %}
+                {% if profile.photo %}<p>Blood Group: {{ profile.get_blood_group_display }}</p> {% endif %}
+                {% if profile.photo %}<p>Category: {{ profile.get_category_display }}</p> {% endif %}
+
+                {% if profile.photo %}<p>Address: {{ profile.address }}</p> {% endif %}
+                {% if profile.photo %}<p>City: {{ profile.city }}</p> {% endif %}
+                {% if profile.photo %}<p>State: {{ profile.state }}</p> {% endif %}
+
             </div>
         </div>
 
 
         <div class="col-6">
-            <br>
-            <a href="{% url 'visitor:past_visitor' %}">1. Past Visitors</a><br>
-            <a href="{% url 'visitor:schedule' %}">2. Schedule new Visit</a><br>
-        </div>
+            <br><br>
+            <i style=" background:;
+  border-radius: 20px;
+  font-size: 25px;
+  text-align: center;
+  border-radius:50%;
+  display:inline-block;
+  padding:10px;">
+                <div style="width:200px; height:200px;" class="text-center "><a href="{% url 'visitor:past_visitor' %}">Past
+                    Visitors</a>
+                </div>
+            </i>
+            <i style=" background: ;
+  border-radius: 20px;
+  font-size: 25px;
+  text-align: center;
+  border-radius:50%;
+  display:inline-block;
+  padding:10px;">
+                <div style=" width:200px; height:200px;" class=""><a href="{% url 'visitor:schedule' %}"> Schedule new
+                    Visit</a></div>
+            </i></div>
 
-        <div class=" col-md-3 col-lg-3 card text-white bg-info mb-3 "
+        <div class=" col-md-2 col-lg-3 card text-white bg-info mb-3 "
              style="max-width: 20rem; margin-top:3rem; margin-left:2rem;">
             <div class="card-header">Approved Schedule</div>
             <div class="card-body">
@@ -54,4 +97,5 @@
             </div>
         </div>
     </div>
+
 {% endblock %}
