@@ -160,6 +160,9 @@
 
 
         function showqr() {
+
+            var btn = document.getElementById('qr');
+            btn.hidden = true;
             var data = document.getElementById('name').innerHTML;
             data = data + document.getElementById('in_time').innerHTML;
             data = data + document.getElementById('out_time').innerHTML;
