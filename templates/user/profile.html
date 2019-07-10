@@ -1,48 +1,59 @@
 {% extends 'base.html' %}
 
 {% block title %}
-<title>Profile</title>
+    <title>Profile</title>
     <style>
-    p {
-        font-family: 'Montserrat', monospace;
-        font-size: 15px;
-    }
+        p {
+            font-family: "Poppins", sans-serif;
+            font-size: 15px;
+        }
     </style>
-    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
 {% endblock %}
 
 {% block body %}
-    <div class="container" style="padding-top: 40px; padding-bottom: 150px">
-    <ul>
     <div class="container">
-         <h1 class="float-left">Profile</h1>
-        <a href="{% url 'visitor:update_profile' %}" class="genric-btn success-border radius float-right">Update Profile</a>
-    </div>
-
-    <br>
-    <br>
-    <hr style="margin-bottom: 20px">
+        <a class="genric-btn success-border radius mb-3 float-right" href="{% url 'visitor:update_profile' %}">Update
+            Profile</a>
 
         {% if profile.photo %}
 
-            <div class="col-md-4 float-right">
-                <a href="{{ profile.photo.url }}" class="img-pop-up">
-                    <div class="single-gallery-image" style="height:330px;background: url({{ profile.photo.url }});"></div></a>
-            </div>
-        {% endif %}
-        <p>Username: {{ user }}</p>
-        <p>{{ profile.get_type_display }}</p>
-        <p>Name: {{ user.get_full_name }}</p>
-        <p>Email: {{ user.email }}</p>
-        <p>{{ profile.get_gender_display }}</p>
-        <p>{{ profile.date_of_birth }}</p>
-        <p>{{ profile.get_blood_group_display }}</p>
-        <p>{{ profile.address }}</p>
-        <p>{{ profile.city }}</p>
-        <p>{{ profile.state }}</p>
-        <p>{{ profile.get_category_display}}</p>
-        <p>{{ profile.contact }}</p>
-    </ul>
-    </div>
+            <img class=" img-popup img-thumbnail mx-auto float-right" src="{{ profile.photo.url }}"
+                 style="width:200px; height: 200px;">
 
+        {% endif %}
+
+        <p>
+        <h3>{{ user.get_full_name }}</h3></p>
+        <p><h5>{{ profile.get_designation_display }}</h5></p>
+        <p><i class="fa fa-envelope" style="font-size:20px">  {{ user.email }}</i></p>
+        <p><i class="fa fa-phone" style="font-size:20px">  {{ profile.contact }}</i></p>
+        <div class="row">
+            <div class="col-md-6 col-lg-6">
+                <h4>Individual Information</h4>
+                <p>Username:{{ user }}</p>
+                <p>
+                <p>Date of Birth</p><h5>:{{ profile.date_of_birth }}</h5></p>
+                <p>
+                <p>Gender:</p><h5>{{ profile.get_gender_display }}</h5></p>
+                <p>
+                <p>Blood Group: </p><h5>{{ profile.get_blood_group_display }}</h5></p>
+                <p>
+                <p>Category: </p><h5>{{ profile.get_category_display }}</h5></p>
+
+            </div>
+            <div class=" col-md-6 ">
+                <h3>Location</h3>
+                <p>
+                <p>Address: </p><h5>{{ profile.address }}</h5></p>
+
+                <p>
+                <p>City: </p><h5>{{ profile.city }}</h5></p>
+
+                <p>
+                <p>State: </p><h5>{{ profile.state }}</h5></p>
+
+            </div>
+
+        </div>
+    </div>
 {% endblock %}

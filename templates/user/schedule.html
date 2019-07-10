@@ -5,34 +5,38 @@
     <title>Schedules</title>
 
     <style>
-        select {
+        input {
             border: none;
-            border-radius: 0px;
-            height: 40px;
             background: #f9f9ff;
-            padding-left: 20px;
-            padding-right: 40px;
+            font-family: "Poppins", sans-serif;
+        }
+        input:focus{
+            outline: none;
+        }
+
+        select {
+            display: inline-flex;
+            line-height: 40px;
+            border: none;
+            background: #f9f9ff;
+            padding: 0 20px;
+            border-collapse: unset;
+            height: 40px;
         }
 
         .errorlist li {
             color: red;
         }
 
-        #id_purpose::placeholder {
-        }
     </style>
 
 {% endblock %}
 
 {% block body %}
-
-
-
-    <div class="container" style="padding-top: 150px; padding-bottom: 150px">
+    <div class="container" style="padding-top: 50px;padding-bottom: 100px;margin-left: auto;">
+        <h1 class="h3 mb-30 font-weight-heavy">Create Schedule</h1>
         <form class="form-group" action="" method="post" enctype="multipart/form-data" novalidate>
             {% csrf_token %}
-
-
             {% if flag == 1 %}
                 <p>Schedule has been created Sucessfully!</p>
                 <a href="{% url 'visitor:schedule' %}">Add New Schedule</a>
@@ -47,18 +51,19 @@
                             <div class="mt-10">
                                 <div class="row">
 
-                                    <div class="col-md-2 col-lg-2 text-capitalize mt-8 text-dark ">
+                                    <div class="col-md-2 col-2 text-capitalize mt-8 text-dark ">
                                         {{ field.label_tag }}
                                     </div>
 
-                                    <div class="col-md-6 col-lg-6">
-                                        {% render_field field class="form-control" placeholder=field.label %}
+                                    <div class="col-md-6 col-6 single-input">
+                                        {% render_field field placeholder=field.label %}
                                     </div>
 
-                                    <div class="col-md-3 col-lg-3 mt-2 p-0">
+                                    <div class=" col-3 col-md-3 col-lg-3 mt-2 " style="padding-left: 10px;">
                                         {% if field.label == 'Visitor id' %}
                                             <a href="{% url 'visitor:update_visitor' %}" onclick="window.open(this.href, 'mywin',
-'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" target="_blank" ><i class="fa fa-plus"></i></a>
+                                                               'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;"
+                                               target="_blank"><i class="fa fa-plus" style="size: inherit"></i></a>
                                         {% endif %}
                                     </div>
 
@@ -78,6 +83,11 @@
 
 
                 </form>
+
+                </div>
+
+
+
                 </div>
 
             {% endif %}
