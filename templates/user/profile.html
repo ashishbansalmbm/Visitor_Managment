@@ -3,6 +3,10 @@
 {% block title %}
     <title>Profile</title>
     <style>
+        b {
+            color: black;
+        }
+
         p {
             font-family: "Poppins", sans-serif;
             font-size: 15px;
@@ -12,48 +16,60 @@
 
 {% block body %}
     <div class="container">
-        <a class="genric-btn success-border radius mb-3 float-right" href="{% url 'visitor:update_profile' %}">Update
-            Profile</a>
+        <div class="row mt-50">
+            <div class="col-md-9 col-12">
+                <div class="row">
+                    <div class="col-md-5 ">
+                        {% if profile.photo %}
 
-        {% if profile.photo %}
+                            <img class=" img-popup img-thumbnail mx-auto " src="{{ profile.photo.url }}" alt=" No Image"
+                                 style="width:200px; height: 200px;">
 
-            <img class=" img-popup img-thumbnail mx-auto float-right" src="{{ profile.photo.url }}"
-                 style="width:200px; height: 200px;">
+                        {% endif %}
+                    </div>
+                    <div class="col-md-7 text-md-left ">
+                        <p>
+                        <h3 style="text-transform: uppercase">{{ user.get_full_name }}</h3></p>
+                        <p><h4 style="text-transform: uppercase">{{ profile.get_designation_display }}</h4></p>
+                        <p><i class="fa fa-envelope" style="font-size:16px">  {{ user.email }}</i></p>
+                        <p><i class="fa fa-phone" style="font-size:16px">  {{ profile.contact }}</i></p>
 
-        {% endif %}
+                    </div>
+                </div>
+                <div class="row mt-40 mb-40">
+                    <div class="col-md-5 text-md-left">
+                        <h4>DETAILS</h4>
+                        <p></p>
+                        <p><b>USERNAME : </b>{{ user }}</p>
+                        <p><b>DATE OF BIRTH : </b><{{ profile.date_of_birth }}</p>
+                        <p><b>GENDER : </b>{{ profile.get_gender_display }}</p>
+                        <p><b>BLOOD GROUP : </b>{{ profile.get_blood_group_display }}</p>
+                        <p><b>CATEGORY : </b>{{ profile.get_category_display }}</p>
 
-        <p>
-        <h3>{{ user.get_full_name }}</h3></p>
-        <p><h5>{{ profile.get_designation_display }}</h5></p>
-        <p><i class="fa fa-envelope" style="font-size:20px">  {{ user.email }}</i></p>
-        <p><i class="fa fa-phone" style="font-size:20px">  {{ profile.contact }}</i></p>
-        <div class="row">
-            <div class="col-md-6 col-lg-6">
-                <h4>Individual Information</h4>
-                <p>Username:{{ user }}</p>
-                <p>
-                <p>Date of Birth</p><h5>:{{ profile.date_of_birth }}</h5></p>
-                <p>
-                <p>Gender:</p><h5>{{ profile.get_gender_display }}</h5></p>
-                <p>
-                <p>Blood Group: </p><h5>{{ profile.get_blood_group_display }}</h5></p>
-                <p>
-                <p>Category: </p><h5>{{ profile.get_category_display }}</h5></p>
+                    </div>
+                    <div class=" col-md-5 text-md-left ">
+                        <h4>ADDRESS</h4>
+                        <p></p>
+                        <p><b>HOUSE : </b>{{ profile.address }}</p>
+                        <p></p>
+                        <p><b>CITY : </b>{{ profile.city }}</p>
+                        <p></p>
+                        <p><b>STATE : </b>{{ profile.state }}</p>
+
+                    </div>
+
+                </div>
+
 
             </div>
-            <div class=" col-md-6 ">
-                <h3>Location</h3>
-                <p>
-                <p>Address: </p><h5>{{ profile.address }}</h5></p>
-
-                <p>
-                <p>City: </p><h5>{{ profile.city }}</h5></p>
-
-                <p>
-                <p>State: </p><h5>{{ profile.state }}</h5></p>
+            <div class="col-md-3 col-12 center">
+                <a class="genric-btn success-border radius mb-3 float-right" href="{% url 'visitor:update_profile' %}">Update
+                    Profile</a>
 
             </div>
-
         </div>
     </div>
+
+
+
 {% endblock %}
