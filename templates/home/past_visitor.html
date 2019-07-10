@@ -2,29 +2,73 @@
 {% load static %}
 {% block title %}
     <title>Past Visitors</title>
+    <style>
+table {
+  border-collapse: collapse;
+  border-spacing: 1px;
+  width: 100%;
+  border: 5px solid #ddd;
+}
+
+th, td {
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even){background-color: #f2f2f2}
+    .bg-info{
+        background-color: #4cd3e3 !important;
+    }
+</style>
 {% endblock %}
 
 {% block body %}
-    <div class="container">
-        {% for vr in past_visitors %}
-            {% if vr.photo %}
-                <div class="col-md-4 float-right">
-                <a href="/media/{{ vr.photo }}" class="img-pop-up">
-                    <div class="single-gallery-image" style="height:330px;background: url(/media/{{ vr.photo }});"></div></a>
-            </div>
-            {% endif %}
-            <dl>
-                <dt>Name: {{ vr.visitor_id }}</dt>
-                <dd>Purpose: {{ vr.purpose }}</dd>
-                <dd>Allowed Device: {{ vr.allowed_devices }}</dd>
-                <dd>In- Time: {{ vr.in_time }}</dd>
-                <dd>Out- Time: {{ vr.out_time }}</dd>
-                <dd>Allowed Days: {{ vr.allowed_days }}</dd>
-                <dd>Meeting Place: {{ vr.meeting_place }}</dd>
-                <dd>Phone: {{ vr.phone }}</dd>
-                <dd>E-mail: {{ vr.email }}</dd>
-                <dd>Designation: {{ vr.designation }}</dd>
-            </dl>
-        {% endfor %}
-    </div>
+    <br>
+
+
+    <center><h1> Past Visitors </h1></center>
+    <br>
+    <div style="overflow-x:auto;">
+
+        <table class="table">
+    <tr>
+          <thead class="bg-info">
+      <th> Name</th>
+      <th>Purpose</th>
+      <th>Allowed Device</th>
+      <th>In- Time</th>
+      <th>Out- Time</th>
+      <th>Allowed Days</th>
+      <th>Meeting Place</th>
+      <th>Phone</th>
+      <th>E-mail</th>
+      <th>Designation</th>
+      <th>Photo</th>
+          </thead>
+    </tr>
+  {% for vr in past_visitors %}
+        <tr>
+      <td>{{ vr.visitor_id }}</td>
+      <td>{{ vr.purpose }}</td>
+      <td>{{ vr.allowed_devices }}</td>
+      <td>{{ vr.in_time }}</td>
+      <td>{{ vr.out_time }}</td>
+      <td>{{ vr.allowed_days }}</td>
+      <td>{{ vr.meeting_place }}</td>
+      <td>{{ vr.phone }}</td>
+      <td>{{ vr.email }}</td>
+      <td>{{ vr.designation }}</td>
+            <td>{% if vr.photo %} <a href="/media/{{ vr.photo }}" class="img-pop-up"><img src="/media/{{ vr.photo }}" style="width:90px; height: 100px;" /></a>{% endif %}</td>
+
+         {% endfor %}
+        </table>
+
+{#    <div class="container">#}
+{#       #}
+{#            {% if vr.photo %}#}
+{#                <div class="col-md-4 float-right">#}
+{#                    <a href="{{ vr.photo.url }}" class="img-pop-up">#}
+{#                            <div class=" single-gallery-image "#}
+{#                                 style="height:330px;background: url({{ vr.photo.url}});"></div>#}
+{#{% endif %}#}
 {% endblock %}
