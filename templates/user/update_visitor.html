@@ -3,20 +3,53 @@
 
 {% block title %}
     <title>Update</title>
+    <style>
+    .form-control
+    {
+        border:none;!important;
+            background:#f9f9ff;!important;
+            font-family: "Poppins", sans-serif;!important;
+    }
+      input {
+            border:none;!important;
+            background:#f9f9ff;!important;
+            font-family: "Poppins", sans-serif;!important;
+        }
+        input:focus{
+            outline: none;
+        }
+
+        select {
+            display: inline-flex;
+            line-height: 40px;
+            border: none;
+            background: #f9f9ff;
+            padding: 0 20px;
+            border-collapse: unset;
+            height: 40px;
+        }
+
+        .errorlist li {
+            color: red;
+        }
+
+    </style>
 {% endblock %}
 {% block body %}
 
+    <div class="container" style="padding-top: 50px;padding-bottom: 100px;margin-left: auto;">
+        {% if flag == 1 %}
+            <p> Visitor Added Successfully!</p>
+            <button class="genric-btn success-border radius" onclick="window.opener.location.reload(); window.close()"
+                    style="margin-left: 150px">Close
+            </button>
+        {% else %}
+            <h1 class="h3 mb-30 font-weight-heavy">Add Visitor</h1>
+            <form method="post">
 
-    {% if flag == 1 %}
-    <p> Visitor Added Successfully!</p>
-        <button class="genric-btn success-border radius" onclick="window.opener.location.reload(); window.close()" style="margin-left: 150px">Close
-                    </button>
-    {% else %}
-    <form method="post">
-
-    {% csrf_token %}
-        {% for field in update_form %}
-        <p>
+                {% csrf_token %}
+                {% for field in update_form %}
+                    <p>
                         <bold>{{ field.errors }}</bold>
                     </p>
                     <div>
@@ -27,20 +60,20 @@
                                         {{ field.label_tag }}
                                     </div>
 
-                                    <div class="col-md-6 col-lg-6">
+                                    <div class="col-md-6 col-lg-6 single-input">
                                         {% render_field field class="form-control" placeholder=field.label %}
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-        {% endfor %}
+                {% endfor %}
 
                 <div class="mt-10">
                     <button type="submit" class="genric-btn success-border radius" style="margin-left: 150px">Update
                     </button>
                 </div>
-    </form>
-
-    {% endif %}
+            </form>
+            </div>
+        {% endif %}
 {% endblock %}

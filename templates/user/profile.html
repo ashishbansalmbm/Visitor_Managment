@@ -1,48 +1,75 @@
 {% extends 'base.html' %}
 
 {% block title %}
-<title>Profile</title>
+    <title>Profile</title>
     <style>
-    p {
-        font-family: 'Montserrat', monospace;
-        font-size: 15px;
-    }
+        b {
+            color: black;
+        }
+
+        p {
+            font-family: "Poppins", sans-serif;
+            font-size: 15px;
+        }
     </style>
-    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
 {% endblock %}
 
 {% block body %}
-    <div class="container" style="padding-top: 40px; padding-bottom: 150px">
-    <ul>
     <div class="container">
-         <h1 class="float-left">Profile</h1>
-        <a href="{% url 'visitor:update_profile' %}" class="genric-btn success-border radius float-right">Update Profile</a>
-    </div>
+        <div class="row mt-50">
+            <div class="col-md-9 col-12">
+                <div class="row">
+                    <div class="col-md-5 ">
+                        {% if profile.photo %}
 
-    <br>
-    <br>
-    <hr style="margin-bottom: 20px">
+                            <img class=" img-popup img-thumbnail mx-auto " src="{{ profile.photo.url }}" alt=" No Image"
+                                 style="width:200px; height: 200px;">
 
-        {% if profile.photo %}
+                        {% endif %}
+                    </div>
+                    <div class="col-md-7 text-md-left ">
+                        <p>
+                        <h3 style="text-transform: uppercase">{{ user.get_full_name }}</h3></p>
+                        <p><h4 style="text-transform: uppercase">{{ profile.get_designation_display }}</h4></p>
+                        <p><i class="fa fa-envelope" style="font-size:16px">  {{ user.email }}</i></p>
+                        <p><i class="fa fa-phone" style="font-size:16px">  {{ profile.contact }}</i></p>
 
-            <div class="col-md-4 float-right">
-                <a href="{{ profile.photo.url }}" class="img-pop-up">
-                    <div class="single-gallery-image" style="height:330px;background: url({{ profile.photo.url }});"></div></a>
+                    </div>
+                </div>
+                <div class="row mt-40 mb-40">
+                    <div class="col-md-5 text-md-left">
+                        <h4>DETAILS</h4>
+                        <p></p>
+                        <p><b>USERNAME : </b>{{ user }}</p>
+                        <p><b>DATE OF BIRTH : </b><{{ profile.date_of_birth }}</p>
+                        <p><b>GENDER : </b>{{ profile.get_gender_display }}</p>
+                        <p><b>BLOOD GROUP : </b>{{ profile.get_blood_group_display }}</p>
+                        <p><b>CATEGORY : </b>{{ profile.get_category_display }}</p>
+
+                    </div>
+                    <div class=" col-md-5 text-md-left ">
+                        <h4>ADDRESS</h4>
+                        <p></p>
+                        <p><b>HOUSE : </b>{{ profile.address }}</p>
+                        <p></p>
+                        <p><b>CITY : </b>{{ profile.city }}</p>
+                        <p></p>
+                        <p><b>STATE : </b>{{ profile.state }}</p>
+
+                    </div>
+
+                </div>
+
+
             </div>
-        {% endif %}
-        <p>Username: {{ user }}</p>
-        <p>{{ profile.get_type_display }}</p>
-        <p>Name: {{ user.get_full_name }}</p>
-        <p>Email: {{ user.email }}</p>
-        <p>{{ profile.get_gender_display }}</p>
-        <p>{{ profile.date_of_birth }}</p>
-        <p>{{ profile.get_blood_group_display }}</p>
-        <p>{{ profile.address }}</p>
-        <p>{{ profile.city }}</p>
-        <p>{{ profile.state }}</p>
-        <p>{{ profile.get_category_display}}</p>
-        <p>{{ profile.contact }}</p>
-    </ul>
+            <div class="col-md-3 col-12 center">
+                <a class="genric-btn success-border radius mb-3 float-right" href="{% url 'visitor:update_profile' %}">Update
+                    Profile</a>
+
+            </div>
+        </div>
     </div>
+
+
 
 {% endblock %}
