@@ -17,5 +17,6 @@ urlpatterns = [
     path('home/guard_homepage/', views.guard_homepage, name="guard_homepage"),
     path('home/guard_homepage/visitor_entry/', views.visitor_profile, name="visitor_profile"),
     path('scan/qr/', views.scan_qr, name="scan-qr"),
+    path('my/schedules', views.my_schedule, name='my_schedules')
    # path('home/view/',views.html_to_pdf_view,name="html_to_pdf_view"),
 ]

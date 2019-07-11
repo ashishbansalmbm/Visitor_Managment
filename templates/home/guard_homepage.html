@@ -12,7 +12,7 @@
             <div class="card-body">
                 {% for vr in user %}
                     <dl>
-                        <dt>{{ vr.visitor_id }}</dt>
+                        <dt class="text-capitalize">{{ vr.visitor_id }}</dt>
                         <dd> {{ vr.in_time }}</dd>
                     </dl>
                 {% endfor %}
@@ -59,8 +59,9 @@
             <div class="card-body">
                 {% for vr in visitor %}
                     <dl>
-                        <dt>{{ vr.schedule_id }}</dt>
-                        <dd> {{ vr.in_time }}</dd>
+                        <dt class="text-capitalize">{{ vr.schedule_id.visitor_id.name }}</dt>
+                        <dd><b>In-Time:</b> {{ vr.in_time }}</dd>
+                        <dd><b>Scheduled Out-time:</b>{{ vr.schedule_id.out_time }}</dd>
                     </dl>
                 {% endfor %}
             </div>

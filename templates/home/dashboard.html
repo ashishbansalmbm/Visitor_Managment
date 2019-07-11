@@ -58,11 +58,16 @@
 
 
         <div class="col-md-6 col-lg-6 mt-5">
+
+            <div><a href="{% url 'visitor:my_schedules' %}">My Schedules</a>
+            </div>
             <div><a href="{% url 'visitor:past_visitor' %}">Past
                 Visitors</a>
             </div>
             <div><a href="{% url 'visitor:schedule' %}"> Schedule new
                 Visit</a>
+            </div>
+            <div><a href="{% url 'visitor:update_visitor' %}">Add Visitor</a>
             </div>
         </div>
 
@@ -71,8 +76,8 @@
             <div class="card-body">
                 {% for vr in upcoming_visitor %}
                     <dl>
-                        <dt>{{ vr.visitor_id }}</dt>
-                        <dd> {{ vr.purpose }}</dd>
+                        <dt>Id: {{ vr.visitor_id }}</dt>
+                        <dd>Purpose: {{ vr.purpose }}</dd>
                     </dl>
                 {% endfor %}
             </div>

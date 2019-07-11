@@ -86,7 +86,7 @@ def schedule(request):
             flag = 1
             return render(request, 'user/schedule.html', {'flag': flag})
     else:
-        schedule_form = UpdateScheduleForm()
+        schedule_form = UpdateScheduleForm(instance=Schedule.objects.get(pk=1))
     context = {'schedule_form': schedule_form}
     return render(request, 'user/schedule.html', context)
 
@@ -140,19 +140,8 @@ def guard_homepage(request):
                 profile.save()
                 return render(request, 'home/visitor_profile.html')
 
-    # if request.POST['action'] == 'Snap':
-    #     pic = request.POST["photo"];
-    # if request.POST['action'] == 'Snap':
-    #    pic = request.POST["photo"]
-    #    image_data = base64.b64decode(pic[22:] + b'=' * (-len(pic[22:]) % 4))
-    #    imagene = ContentFile(image_data, 'imagen1.png')
-    #    profile = Visitor.objects.raw("select * from visitor_Visitor where phone = %s or id = %s",
-    #                                  [phone_num, input_id])
-    #    profile.photo = imagene
-    #    profile.save()
-
-    user = Schedule.objects.raw('select * from visitor_Schedule where approve=1 and in_time >current_timestamp')
-    visitor = Visit.objects.raw('select * from visitor_Visit where in_time < current_timestamp and out_time = in_time')
+    user = Schedule.objects.raw('select * from visitor_Schedule where approve=1 and in_time >current_timestamp ')
+    visitor = Visit.objects.raw('select * from visitor_Visit where in_time < current_timestamp and out_time = in_time order by in_time')
     return render(request, 'home/guard_homepage.html', {'user': user, 'visitor': visitor})
 
 
@@ -168,7 +157,7 @@ def visitor_profile(request):
 def dashboard(request):
     user = request.user.id
     upcoming_visitor = Schedule.objects.raw(
-        'select * from visitor_Schedule where in_time >current_timestamp  and approve=1 and requested_by_id = %s',
+        'select * from visitor_Schedule where out_time >current_timestamp  and approve=1 and requested_by_id = %s',
         [user])
     context = {'user': user, 'profile': request.user.profile,
                'upcoming_visitor': upcoming_visitor}
@@ -178,24 +167,17 @@ def dashboard(request):
 def past_visitor(request):
     user = request.user.id
     past_visitors = Schedule.objects.raw(
-        'select * from visitor_Schedule as s,visitor_Visitor as v where s.in_time < current_timestamp and  s.requested_by_id = %s and v.id=s.visitor_id_id',
+        'select * from visitor_Schedule as s,visitor_Visitor as x,visitor_Visit as  v where v.in_time < current_timestamp and  s.requested_by_id = %s and s.id=v.schedule_id_id and s.approve = 1 and x.id = s.visitor_id_id',
         [user])
     return render(request, 'home/past_visitor.html', {'past_visitors': past_visitors})
 
 
-# ef html_to_pdf_view(request):
-#   paragraphs = ['first paragraph', 'second paragraph', 'third paragraph']
-#   html_string = render_to_string('home/pdf_template.html', {'paragraphs': paragraphs})
-
-#   html = HTML(string=html_string)
-#   html.write_pdf(target='/tmp/mypdf.pdf');
-
-#   fs = FileSystemStorage('/tmp')
-#   with fs.open('mypdf.pdf') as pdf:
-#       response = HttpResponse(pdf, content_type='application/pdf')
-#       response['Content-Disposition'] = 'attachment; filename="mypdf.pdf"'
-#       return response
-#   return response
-
 def scan_qr(request):
     return render(request, 'user/scan.html')
+
+
+def my_schedule(request):
+    user = request.user.id
+    my_schedule = Schedule.objects.raw(
+        'Select * from visitor_schedule as s where s.requested_by_id=%s order by s.in_time desc ', [user])
+    return render(request, 'home/my_schedule.html', {'my_schedule': my_schedule})

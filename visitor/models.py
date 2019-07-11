@@ -69,7 +69,7 @@ class Schedule(models.Model):
     allowed_devices = models.CharField(max_length=250, blank=True, null=True)
     in_time = models.DateTimeField(default=timezone.now)
     out_time = models.DateTimeField(default=timezone.now)
-    allowed_days = models.DurationField()
+    allowed_days = models.PositiveIntegerField()
     meeting_place = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
