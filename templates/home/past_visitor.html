@@ -26,7 +26,7 @@ tr:nth-child(even){background-color: #f2f2f2}
 <br>
 
 
-<center><h1> Past Visitors </h1></center>
+<h1 class="text-center"> Past Visitors </h1>
 <br>
 <div style="overflow-x:auto;">
 
@@ -48,7 +48,7 @@ tr:nth-child(even){background-color: #f2f2f2}
         </tr>
         {% for vr in past_visitors %}
         <tr>
-            <td>{{ vr.visitor_id }}</td>
+            <td><a href="{% url 'visitor:schedule_edit' sch_id=vr.id %}">{{ vr.visitor_id }}</a> </td>
             <td>{{ vr.purpose }}</td>
             <td>{{ vr.allowed_devices }}</td>
             <td>{{ vr.in_time }}</td>

@@ -64,7 +64,7 @@
                         <td>Pending Approval</td>
                     {% endif %}
                     <td>
-                        <a href="{% url 'visitor:schedule' %}"><i class="fa fa-edit"></i> </a>
+                        <a href="{% url 'visitor:schedule_edit' sch_id=vr.id %}"><i class="fa fa-edit"></i> </a>
                         <a href="#" class="ml-2" style="color: indianred"><i class="fa fa-remove"></i></a>
                     </td>
 

@@ -75,9 +75,7 @@ def test(request):
     return render(request, 'home/test.html')
 
 
-#
-#   def visitor(request):
-#
+
 
 def schedule(request):
     if request.method == "POST":
@@ -87,7 +85,20 @@ def schedule(request):
             flag = 1
             return render(request, 'user/schedule.html', {'flag': flag})
     else:
-        schedule_form = UpdateScheduleForm(instance=Schedule.objects.get(pk=1))
+        schedule_form = UpdateScheduleForm()
+    context = {'schedule_form': schedule_form}
+    return render(request, 'user/schedule.html', context)
+
+
+def schedule_edit(request, sch_id):
+    if request.method == "POST":
+        schedule_form = UpdateScheduleForm(request.POST)
+        if schedule_form.is_valid():
+            schedule_form.save()
+            flag = 1
+            return render(request, 'user/schedule.html', {'flag': flag})
+    else:
+        schedule_form = UpdateScheduleForm(instance=Schedule.objects.get(pk=sch_id))
     context = {'schedule_form': schedule_form}
     return render(request, 'user/schedule.html', context)
 
@@ -157,8 +168,7 @@ def guard_homepage(request):
     return render(request, 'home/guard_homepage.html', {'user': user, 'visitor': visitor})
 
 
-
-def visitor_profile(request):
+def visitor_profile(request,pk):
     visitor_form = VisitorEntryForm()
     context = {'visitor_form': visitor_form}
     return render(request, 'home/visitor_profile.html', context)
@@ -198,6 +208,3 @@ def in_time_enter(request):
         id = request.POST.get('id')
         instance = Visit.objects.create(schedule_id_id=id)
         return render(request, 'home/visitor_profile.html')
-
-
-

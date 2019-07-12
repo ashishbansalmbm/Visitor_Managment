@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 from . import views
 
 app_name = 'visitor'
@@ -15,9 +15,11 @@ urlpatterns = [
     path('schedule/', views.schedule, name="schedule"),
     path('visitor/update/', views.update_visitor, name="update_visitor"),
     path('home/guard_homepage/', views.guard_homepage, name="guard_homepage"),
-    path('home/guard_homepage/visitor_entry/', views.visitor_profile, name="visitor_profile"),
+    # path('home/guard_homepage/visitor_entry/', views.visitor_profile, name="visitor_profile"),
     path('scan/qr/', views.scan_qr, name="scan-qr"),
     path('my/schedules/', views.my_schedule, name='my_schedules'),
-    path('in/time/enter/', views.in_time_enter)
+    re_path(r'^my/schedules/(?P<sch_id>\d+)/', views.schedule_edit, name='schedule_edit'),
+    path('in/time/enter/', views.in_time_enter),
+   # re_path(r'^profile/(?P<pk>\d+)/' ,views.visitor_profile, name="visitor_profile"),
    # path('home/view/',views.html_to_pdf_view,name="html_to_pdf_view"),
 ]
