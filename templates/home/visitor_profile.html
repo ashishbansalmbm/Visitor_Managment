@@ -57,14 +57,18 @@
                             <b>Name:</b>
                             <p class="card-text" id="name">{{ profile.name }}</p>
                             <p class="card-text"><b>Phone:</b>{{ profile.phone }}</p>
-                            {% for schedule in schedul %}
+
+                            {% for schedule in schedule %}
                                 <p class="card-text"><b>Purpose:</b> {{ schedule.purpose }}</p>
                                 <p class="card-text"><b>Allowed Devices:</b> {{ schedule.allowed_devices }}</p>
-                                <b>In-Time:</b>
+                                <b>Scheduled In-Time:</b>
+                                <p hidden id="id">{{ schedule.id }}</p>
                                 <p class="card-text" id="in_time">{{ schedule.in_time }}</p>
-                                <b>Out-Time:</b>
+                                <b>Scheduled Out-Time:</b>
                                 <p class="card-text" id="out_time">{{ schedule.out_time }}</p>
                             {% endfor %}
+                            <button type="button" class="noprint" id="enter" onclick="inTimeEnter()">Mark Entry
+                            </button>
                             <button type="button" class="noprint" id="qr" onclick="showqr()">View-QR</button>
                         </div>
 
@@ -72,7 +76,7 @@
                     </ul>
                     </div>
 
-                     <div class="noprint mt-5 col">
+                    <div class="noprint mt-5 col">
                         <video height="250px" width="250px"></video>
                     </div>
                     </div>
@@ -176,6 +180,23 @@
             });
         }
 
+        function inTimeEnter() {
+            var id = document.getElementById('id').innerHTML;
+            var btn = document.getElementById('enter');
+            btn.hidden = true;
+            alert('Entry Success, Print QR Now')
+            $.ajax(
+                {
+                    type: "POST",
+                    url: '/user/in/time/enter/',
+                    data: {
+                        id: id,
+                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                    },
+                });
+        }
+
 
     </script>
+
 {% endblock %}

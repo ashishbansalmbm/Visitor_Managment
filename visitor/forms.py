@@ -28,7 +28,7 @@ class RegistrationForm(UserCreationForm):
 class UpdateUserForm(UserChangeForm):
     class Meta:
         model = User
-        fields = ['email', 'password','first_name','last_name']
+        fields = ['email', 'password']
 
 
 class UpdateProfileFormNotVerified(forms.ModelForm):

@@ -8,6 +8,7 @@ from django.core.files.base import ContentFile
 from .forms import RegistrationForm, UpdateUserForm, UpdateProfileFormVerified, UpdateProfileFormNotVerified, \
     UpdateScheduleForm, UpdateVisitorForm, VisitorEntryForm
 from .models import Schedule, Visitor, Visit
+from django.utils import timezone
 
 
 # Create your views here.
@@ -116,16 +117,26 @@ def guard_homepage(request):
     if request.method == 'POST':
         try:
             if request.POST['action']:
-                input_id = request.POST["idnum"]
-                phone_num = request.POST["phone"]
-                profile = Visitor.objects.raw("select * from visitor_Visitor where phone = %s or id = %s",
-                                              [phone_num, input_id])
+
+                if request.POST["idnum"]:
+                    input_id = request.POST["idnum"]
+                    profile = Visitor.objects.raw("select * from visitor_Visitor where id = %s",
+                                                  [input_id])
+                elif request.POST["phone"]:
+                    phone_num = request.POST["phone"]
+                    profile = Visitor.objects.raw("select * from visitor_Visitor where phone = %s ",
+                                                  [phone_num])
+                else:
+                    input_id = request.POST["idnum"]
+                    phone_num = request.POST["phone"]
+                    profile = Visitor.objects.raw("select * from visitor_Visitor where phone = %s and id = %s",
+                                                  [phone_num, input_id])
                 idn = profile[0].id
+
                 schedul = Schedule.objects.raw(
                     'select * from visitor_Schedule where  approve=1 and visitor_id_id=%s and in_time > current_timestamp ',
                     [idn])
-                visitor_form = VisitorEntryForm()
-                context = {'visitor_form': visitor_form, 'profile': profile, 'schedul': schedul}
+                context = {'profile': profile, 'schedule': schedul}
                 return render(request, 'home/visitor_profile.html', context)
 
         except:
@@ -141,12 +152,11 @@ def guard_homepage(request):
                 return render(request, 'home/visitor_profile.html')
 
     user = Schedule.objects.raw('select * from visitor_Schedule where approve=1 and in_time >current_timestamp ')
-    visitor = Visit.objects.raw('select * from visitor_Visit where in_time < current_timestamp and out_time = in_time order by in_time')
+    visitor = Visit.objects.raw(
+        'select * from visitor_Visit where in_time < current_timestamp and out_time = in_time order by in_time')
     return render(request, 'home/guard_homepage.html', {'user': user, 'visitor': visitor})
 
 
-# def (request):
-#   if request.method == "POST":
 
 def visitor_profile(request):
     visitor_form = VisitorEntryForm()
@@ -181,3 +191,13 @@ def my_schedule(request):
     my_schedule = Schedule.objects.raw(
         'Select * from visitor_schedule as s where s.requested_by_id=%s order by s.in_time desc ', [user])
     return render(request, 'home/my_schedule.html', {'my_schedule': my_schedule})
+
+
+def in_time_enter(request):
+    if request.is_ajax():
+        id = request.POST.get('id')
+        instance = Visit.objects.create(schedule_id_id=id)
+        return render(request, 'home/visitor_profile.html')
+
+
+

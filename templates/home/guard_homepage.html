@@ -9,10 +9,10 @@
     <div class="row">
         <div class=" col-md-3 col-lg-3 card text-black card-color mb-3 ">
             <div class="card-header">Scheduled Visits</div>
-            <div class="card-body">
+            <div class="card-body pre-scrollable">
                 {% for vr in user %}
                     <dl>
-                        <dt class="text-capitalize">{{ vr.visitor_id }}</dt>
+                        <dt class="text-capitalize">{{ vr.visitor_id.id }}  - {{ vr.visitor_id.name }}</dt>
                         <dd> {{ vr.in_time }}</dd>
                     </dl>
                 {% endfor %}
@@ -55,8 +55,8 @@
         </div>
 
         <div class=" col-md-3 col-lg-3 card text-black card-color mb-3">
-            <div class="card-header">Visitors Inside</div>
-            <div class="card-body">
+            <div class="card-header ">Visitors Inside</div>
+            <div class="card-body pre-scrollable">
                 {% for vr in visitor %}
                     <dl>
                         <dt class="text-capitalize">{{ vr.schedule_id.visitor_id.name }}</dt>
