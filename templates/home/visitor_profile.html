@@ -2,9 +2,15 @@
 {% block title %}
     <title xmlns="http://www.w3.org/1999/html">VisitorEntry</title>
     <style>
-        p {
-            font-family: 'Montserrat', monospace;
-            font-size: 15px;
+
+        html, body {
+            font-family: "Poppins", sans-serif;
+            background: #e8ecf1;
+            color: black;
+        }
+
+        b {
+            color: black;
         }
 
         @media print {
@@ -16,6 +22,21 @@
         @media screen {
             ...
         }
+
+        .idcard-front {
+            background: white;
+            width: 450px;
+            border-radius: .2em;
+            box-shadow: 0 2.5em .9em -2em #555;
+            position: absolute;
+        }
+
+        .desc {
+            font-weight: 600;
+            position: relative;
+            width: 100%;
+            text-align: center;
+        }
     </style>
     <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
 {% endblock %}
@@ -25,72 +46,92 @@
 
 {% block body %}
 
+    <div>
+        <h2 class="desc noprint">Welcome to RRSCW</h2>
+    </div>
+    <div class="container">
+        <div class="row mt-3 mb-40">
+            <div class="noprint col-md-6 col-12">
+                <div class="row">
+                    <video height="230px" width="450px"></video>
+                </div>
+                <div class="row">
+                    <div class="controls noprint ">
+                        <button type="button" id="take-photo" title="Take Photo"
+                                class="genric-btn success e-large circle"
+                                style="width: 400px;">Capture
+                        </button>
+                        <br>
+                        <p></p>
+                        <button type="button" id="delete-photo" title="Delete Photo"
+                                class="genric-btn primary e-large disabled circle " style="width:200px;">
+                            Delete
+                        </button>
+                        <button type="button" id="save-photo" title="Save Photo"
+                                class="genric-btn warning e-large disabled circle" style="width: 200px">Save
+                        </button>
+                    </div>
+                </div>
 
-    <div class="container row">
-
-        <div class="mt-5 col-lg-6 offset-2 ">
-            <ul>
-                {% for profile in profile %}
-                    <div class="card" id="printable" style="width:400px">
-                        {% if profile.photo %}
-                            <div class="col-md-4 float-right">
-                                <img src="{{ profile.photo.url }}" style="height:330px; width:370px;">
-                            </div>
-                        {% else %}
-                            <canvas id="snapshot" width="250px" height="250px"></canvas>
-                            <input type="number" hidden id='pk' value={{ profile.id }}>
-
-                            <div class="controls">
-                                <a href="#" id="delete-photo" title="Delete Photo" class="disabled"><i
-                                        class="material-icons">delete</i></a>
-                                <button type="button" id="take-photo" title="Take Photo"><i class="material-icons">Capture</i>
-                                </button>
-                                <a href="#" id="save-photo" title="Save Photo"
-                                   class="disabled"><i
-                                        class="material-icons">Save</i></a>
-                            </div>
-                        {% endif %}
-                        <div class="card-body">
-                            <div id="qrcode"></div>
-                            <h4 class="card-title">Indian Space Research Organisation</h4>
-                            <p class="card-text">Regional Remote Sensing Center West</p>
-                            <b>Name:</b>
-                            <p class="card-text" id="name">{{ profile.name }}</p>
-                            <p class="card-text"><b>Phone:</b>{{ profile.phone }}</p>
-
+            </div>
+            <div class="col-md-6 col-12">
+                <div class="row">
+                    {% for profile in profile %}
+                        <div class="idcard-front pl-2">
+                            <div class="desc">Indian Space Research Organisation</div>
+                            <div class="desc"><b>RRSC-WEST Visitor's Pass</b></div>
+                            {% if profile.photo %}
+                                <div>
+                                    <img class="desc" src="{{ profile.photo.url }}"
+                                         style="height: 120px; width: 120px;  float: right; margin: 10px 30px;">
+                                </div>
+                            {% else %}
+                                <div class="mr-3">
+                                    <canvas id="snapshot" width="130px" height="130px"
+                                            style="float: right; width:130px; height:130px;"></canvas>
+                                    <input type="number" hidden id='pk' value={{ profile.id }}>
+                                </div>
+                            {% endif %}
+                            <p class="" id="name"><b>Name : </b>{{ profile.name }}</p>
+                            <p class=""><b>Phone : </b>{{ profile.phone }}</p>
                             {% for schedule in schedule %}
-                                <p class="card-text"><b>Purpose:</b> {{ schedule.purpose }}</p>
-                                <p class="card-text"><b>Allowed Devices:</b> {{ schedule.allowed_devices }}</p>
-                                <b>Scheduled In-Time:</b>
-                                <p hidden id="id">{{ schedule.id }}</p>
-                                <p class="card-text" id="in_time">{{ schedule.in_time }}</p>
-                                <b>Scheduled Out-Time:</b>
-                                <p class="card-text" id="out_time">{{ schedule.out_time }}</p>
+                                <p class="hidden" id="id">{{ schedule.id }}</p>
+                                <p class=""><b>Purpose : </b> {{ schedule.purpose }}</p>
+                                <p class=""><b>Allowed Devices : </b> {{ schedule.allowed_devices }}</p>
+                                <hr>
+                                <div id="qrcode" style="float: right; margin: 10px 20px ;"></div>
+                                <p class="" id="in_time"><b>In-Time : </b>{{ schedule.in_time }}</p>
+                                <p class="" id="out_time"><b>Out-Time : </b>{{ schedule.out_time }}</p>
+                                <p><b>No. of Days : </b>{{ schedule.allowed_days }}</p>
+                                <p><b>Address : </b>{{ profile.address }}</p>
+                                <p><b>City : </b>{{ profile.city }}</p>
                             {% endfor %}
-                            <button type="button" class="noprint" id="enter" onclick="inTimeEnter()">Mark Entry
-                            </button>
-                            <button type="button" class="noprint" id="qr" onclick="showqr()">View-QR</button>
                         </div>
-
-                    </div>
-                    </ul>
-                    </div>
-
-                    <div class="noprint mt-5 col">
-                        <video height="250px" width="250px"></video>
-                    </div>
-                    </div>
-                    <div class="text-center">
-                        <button class="btn btn-light noprint" onclick="window.print()">Print</button>
-                    </div>
+                    {% endfor %}
+                </div>
 
 
+            </div>
+        </div>
+        <div class="row">
+            <div class="noprint">
+                <button type="button" class="genric-btn success e-large circle" style="width: 400px;" id="qr"
+                        onclick="showqr()">View-QR
+                </button>
+                <p></p>
+                <button type="button" class="genric-btn success e-large circle" style="width: 400px;"
+                        onclick="window.print()">Print
+                </button>
+                <button type="button" class="noprint" id="enter" onclick="inTimeEnter()">Mark Entry</button>
+            </div>
+        </div>
 
-                {% endfor %}
+    </div>
 
 {% endblock %}
 
 {% block script %}
+
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
     <script>
         const vid = document.querySelector('video');
@@ -123,7 +164,6 @@
                 };
             });
 
-
         function takeASnap() {
             const canvas = document.querySelector('canvas'), // create a canvas
                 context = canvas.getContext('2d'); // get its context
@@ -144,27 +184,8 @@
             }
         }
 
-        {#function saveImage(snap) {#}
-        {#         alert('hi');#}
-        {#        $.ajax({#}
-        {#            url: "/user/home/guard_homepage/",#}
-        {#            type: "POST",#}
-        {#            data: snap,#}
-        {#        });#}
-        {#    }#}
-
-
-        {#function download(blob) {#}
-        {#    // uses the <a download> to download a Blob#}
-        {#    let a = document.createElement('a');#}
-        {#    a.href = URL.createObjectURL(blob);#}
-        {#    a.download = 'screenshot.jpg';#}
-        {#    document.body.appendChild(a);#}
-        {#    a.click();#}
-
 
         function showqr() {
-
             var btn = document.getElementById('qr');
             btn.hidden = true;
             var data = document.getElementById('name').innerHTML;
