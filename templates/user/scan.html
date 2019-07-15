@@ -21,6 +21,18 @@
         let scanner = new Instascan.Scanner({video: document.getElementById('preview')});
         scanner.addListener('scan', function (content) {
             alert(content);
+            $.ajax({
+                        type: "POST",
+                        url: "/user/scan/qr/",
+                        data: {
+                            id : content,
+                            csrfmiddlewaretoken: '{{ csrf_token }}',
+                        },
+                        success: function () {
+                            window.location.href = "/user/home/guard_homepage/visitor_entry/"+ content;
+                        }
+
+                    });
         });
         Instascan.Camera.getCameras().then(function (cameras) {
             if (cameras.length > 0) {

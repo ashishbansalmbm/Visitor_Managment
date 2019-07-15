@@ -75,8 +75,6 @@ def test(request):
     return render(request, 'home/test.html')
 
 
-
-
 def schedule(request):
     if request.method == "POST":
         schedule_form = UpdateScheduleForm(request.POST)
@@ -147,6 +145,10 @@ def guard_homepage(request):
                 schedul = Schedule.objects.raw(
                     'select * from visitor_Schedule where  approve=1 and visitor_id_id=%s and in_time > current_timestamp ',
                     [idn])
+                temp = 0;
+                if not schedul:
+                    return HttpResponse('<p>You are not Scheduled for today!</p>'
+                                        '<button onClick="javascript:history.go(-1)">Take me back</button>')
                 context = {'profile': profile, 'schedule': schedul}
                 return render(request, 'home/visitor_profile.html', context)
 
@@ -164,13 +166,20 @@ def guard_homepage(request):
 
     user = Schedule.objects.raw('select * from visitor_Schedule where approve=1 and in_time >current_timestamp ')
     visitor = Visit.objects.raw(
-        'select * from visitor_Visit where in_time < current_timestamp and out_time = in_time order by in_time')
+        'select * from visitor_Visit where in_time < current_timestamp and out_time = in_time order by in_time desc')
     return render(request, 'home/guard_homepage.html', {'user': user, 'visitor': visitor})
 
 
-def visitor_profile(request,pk):
-    visitor_form = VisitorEntryForm()
-    context = {'visitor_form': visitor_form}
+def visitor_profile(request, id):
+    profile = Visitor.objects.raw("select * from visitor_Visitor where id = %s", [id])
+    schedul = Schedule.objects.raw(
+        'select * from visitor_Schedule where  approve=1 and visitor_id_id=%s and in_time > current_timestamp ',
+        [id])
+    temp = 0;
+    if not schedul:
+        return HttpResponse('<p>You are not Scheduled for today!</p>'
+                            '<button onClick="javascript:history.go(-1)">Take me back</button>')
+    context = {'profile': profile, 'schedule': schedul}
     return render(request, 'home/visitor_profile.html', context)
 
 
@@ -193,6 +202,8 @@ def past_visitor(request):
 
 
 def scan_qr(request):
+    if request.method == 'POST':
+        id = request.POST.get('id');
     return render(request, 'user/scan.html')
 
 
@@ -207,4 +218,14 @@ def in_time_enter(request):
     if request.is_ajax():
         id = request.POST.get('id')
         instance = Visit.objects.create(schedule_id_id=id)
+        return render(request, 'home/visitor_profile.html')
+
+
+def out_time_enter(request):
+    if request.is_ajax():
+        id = request.POST.get('id')
+        instance = Visit.objects.raw('select * from visitor_visit as v where v.schedule_id_id=%s order by in_time desc ', [id])
+        data = instance[0]
+        data.out_time = timezone.now()
+        data.save()
         return render(request, 'home/visitor_profile.html')
