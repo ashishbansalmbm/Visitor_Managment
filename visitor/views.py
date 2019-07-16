@@ -1,17 +1,47 @@
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
 import base64
-
+from django.utils import six
 from django.core.files.base import ContentFile
 
 from .forms import RegistrationForm, UpdateUserForm, UpdateProfileFormVerified, UpdateProfileFormNotVerified, \
-    UpdateScheduleForm, UpdateVisitorForm, VisitorEntryForm
+    UpdateScheduleForm, UpdateVisitorForm
 from .models import Schedule, Visitor, Visit
 from django.utils import timezone
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
+from django.contrib.auth.decorators import user_passes_test
+
+
+def group_required(group, login_url=None, raise_exception=False):
+    """
+    Decorator for views that checks whether a user has a group permission,
+    redirecting to the log-in page if necessary.
+    If the raise_exception parameter is given the PermissionDenied exception
+    is raised.
+    """
+
+    def check_perms(user):
+        if isinstance(group, six.string_types):
+            groups = (group,)
+        else:
+            groups = group
+        # First check if the user has the permission (even anon users)
+
+        if user.groups.filter(name__in=groups).exists():
+            return True
+        # In case the 403 handler should be called raise the exception
+        if raise_exception:
+            raise PermissionDenied
+        # As the last resort, show the login form
+        return False
+
+    return user_passes_test(check_perms, login_url=login_url)
 
 
 # Create your views here.
+
 
 def register(request):
     if request.method == 'POST':
@@ -34,11 +64,13 @@ def register(request):
     return render(request, 'registration/registration_form.html', {'form': form})
 
 
+@login_required
 def view_profile(request):
     context = {'user': request.user, 'profile': request.user.profile}
     return render(request, 'user/profile.html', context)
 
 
+@login_required
 def update_profile(request):
     if request.method == "POST":
         user_form = UpdateUserForm(request.POST, instance=request.user)
@@ -64,17 +96,8 @@ def update_profile(request):
     return render(request, 'user/update_profile.html', context)
 
 
-def test(request):
-    if request.method == 'POST':
-        print("hello")
-        name = request.POST['name']
-        year = request.POST['year']
-        print(name, year)
-
-        return HttpResponse("hello")
-    return render(request, 'home/test.html')
-
-
+@login_required
+@group_required('Scientist')
 def schedule(request):
     if request.method == "POST":
         schedule_form = UpdateScheduleForm(request.POST)
@@ -88,6 +111,8 @@ def schedule(request):
     return render(request, 'user/schedule.html', context)
 
 
+@login_required
+@group_required('Scientist')
 def schedule_edit(request, sch_id):
     if request.method == "POST":
         schedule_form = UpdateScheduleForm(request.POST)
@@ -101,6 +126,8 @@ def schedule_edit(request, sch_id):
     return render(request, 'user/schedule.html', context)
 
 
+@login_required
+@group_required('Scientist')
 def update_visitor(request):
     if request.method == "POST":
         update_form = UpdateVisitorForm(request.POST)
@@ -116,12 +143,15 @@ def update_visitor(request):
     return render(request, 'user/update_visitor.html', context)
 
 
+@login_required
 def filter_by_date(date):
     return Schedule.filter(in_time__year=date.year,
                            in_time__month=date.month,
                            in_time__day=date.day)
 
 
+@login_required
+@group_required('Guard')
 def guard_homepage(request):
     if request.method == 'POST':
         try:
@@ -143,8 +173,7 @@ def guard_homepage(request):
                 idn = profile[0].id
 
                 schedul = Schedule.objects.raw(
-                    'select * from visitor_Schedule where  approve=1 and visitor_id_id=%s and in_time > current_timestamp ',
-                    [idn])
+                    'select * from visitor_Schedule where  approve=1 and visitor_id_id=%s and julianday(current_timestamp) - julianday(in_time) < allowed_days and date(in_time)<= CURRENT_DATE order by in_time desc',[idn])
                 temp = 0;
                 if not schedul:
                     return HttpResponse('<p>You are not Scheduled for today!</p>'
@@ -164,12 +193,14 @@ def guard_homepage(request):
                 profile.save()
                 return render(request, 'home/visitor_profile.html')
 
-    user = Schedule.objects.raw('select * from visitor_Schedule where approve=1 and in_time >current_timestamp ')
+    user = Schedule.objects.raw('select * from visitor_Schedule where approve=1 and julianday(current_timestamp) - julianday(in_time) < allowed_days and date(in_time)<= CURRENT_DATE  order by in_time desc')
     visitor = Visit.objects.raw(
         'select * from visitor_Visit where in_time < current_timestamp and out_time = in_time order by in_time desc')
     return render(request, 'home/guard_homepage.html', {'user': user, 'visitor': visitor})
 
 
+@login_required
+@group_required('Guard')
 def visitor_profile(request, id):
     profile = Visitor.objects.raw("select * from visitor_Visitor where id = %s", [id])
     schedul = Schedule.objects.raw(
@@ -183,6 +214,23 @@ def visitor_profile(request, id):
     return render(request, 'home/visitor_profile.html', context)
 
 
+@login_required
+@group_required('Guard')
+def visitor_profile_out(request, id):
+    profile = Visitor.objects.raw("select * from visitor_Visitor where id = %s", [id])
+    schedul = Schedule.objects.raw(
+        'select * from visitor_Schedule where visitor_id_id=%s and out_time > current_timestamp ',
+        [id])
+    temp = 0;
+    if not schedul:
+        return HttpResponse('<p>You are not Scheduled for today!</p>'
+                            '<button onClick="javascript:history.go(-1)">Take me back</button>')
+    context = {'profile': profile, 'schedule': schedul}
+    return render(request, 'home/visitor_profile.html', context)
+
+
+@login_required
+@group_required('Scientist')
 def dashboard(request):
     user = request.user.id
     upcoming_visitor = Schedule.objects.raw(
@@ -193,6 +241,8 @@ def dashboard(request):
     return render(request, 'home/dashboard.html', context)
 
 
+@login_required
+@group_required('Scientist')
 def past_visitor(request):
     user = request.user.id
     past_visitors = Schedule.objects.raw(
@@ -201,12 +251,16 @@ def past_visitor(request):
     return render(request, 'home/past_visitor.html', {'past_visitors': past_visitors})
 
 
+@login_required
+@group_required('Guard')
 def scan_qr(request):
     if request.method == 'POST':
         id = request.POST.get('id');
     return render(request, 'user/scan.html')
 
 
+@login_required
+@group_required('Scientist')
 def my_schedule(request):
     user = request.user.id
     my_schedule = Schedule.objects.raw(
@@ -214,6 +268,8 @@ def my_schedule(request):
     return render(request, 'home/my_schedule.html', {'my_schedule': my_schedule})
 
 
+@login_required
+@group_required('Guard')
 def in_time_enter(request):
     if request.is_ajax():
         id = request.POST.get('id')
@@ -221,10 +277,13 @@ def in_time_enter(request):
         return render(request, 'home/visitor_profile.html')
 
 
+@login_required
+@group_required('Guard')
 def out_time_enter(request):
     if request.is_ajax():
         id = request.POST.get('id')
-        instance = Visit.objects.raw('select * from visitor_visit as v where v.schedule_id_id=%s order by in_time desc ', [id])
+        instance = Visit.objects.raw(
+            'select * from visitor_visit as v where v.schedule_id_id=%s order by in_time desc ', [id])
         data = instance[0]
         data.out_time = timezone.now()
         data.save()
