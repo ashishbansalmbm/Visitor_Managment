@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}
     <title xmlns="http://www.w3.org/1999/html">VisitorEntry</title>
     <style>
@@ -17,6 +18,18 @@
             .noprint {
                 display: none;
             }
+
+            .print {
+                margin-left: 12vh;
+                top: 18vh;
+                bottom: 0px;
+                width: auto;
+                height: 100vh;
+                transform: scale(2.0);
+
+            }
+
+
         }
 
         @media screen {
@@ -29,6 +42,7 @@
             border-radius: .2em;
             box-shadow: 0 2.5em .9em -2em #555;
             position: absolute;
+            outline: #00000087 1px solid;
         }
 
         .desc {
@@ -37,6 +51,15 @@
             width: 100%;
             text-align: center;
         }
+
+        button {
+            min-width: 200px;
+            margin-top: 5px;
+            color: black !important;
+            font-size: 20px !important;
+        }
+
+
     </style>
     <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
 {% endblock %}
@@ -46,91 +69,114 @@
 
 {% block body %}
 
-    <div>
+    <div class="mt-5">
         <h2 class="desc noprint">Welcome to RRSCW</h2>
     </div>
+
     <div class="container">
-        <div class="row mt-3 mb-40">
-            <div class="noprint col-md-6 col-12">
-                <div class="row">
+        <div class="row">
+
+            <div class="col-lg-6 col-md-6 mt-5 noprint text-center">
+
+                <div class="row" style="display: block">
                     <video height="230px" width="450px"></video>
                 </div>
-                <div class="row">
-                    <div class="controls noprint ">
+
+                <div class="container">
+
+                    <div>
                         <button type="button" id="take-photo" title="Take Photo"
-                                class="genric-btn success e-large circle"
-                                style="width: 400px;">Capture
+                                class="btn btn-info radius e-large">Capture
                         </button>
-                        <br>
-                        <p></p>
-                        <button type="button" id="delete-photo" title="Delete Photo"
-                                class="genric-btn primary e-large disabled circle " style="width:200px;">
-                            Delete
-                        </button>
+
                         <button type="button" id="save-photo" title="Save Photo"
-                                class="genric-btn warning e-large disabled circle" style="width: 200px">Save
+                                class="btn btn-success radius e-large">Save
+                        </button>
+
+                    </div>
+                    <div class="mt-3">
+
+                        <button type="button" hidden class="btn btn-info success e-large" id="qr"
+                                onclick="showqr()">View-QR
+                        </button>
+
+                        <button type="button" class="btn btn-info success e-large"
+                                onclick="window.print()">Print
+                        </button>
+
+                    </div>
+
+                    <div class="mt-5">
+
+                        <button type="button" class="btn btn-info e-large" id="enter" onclick="inTimeEnter()">In Time
+                            Entry
+                        </button>
+
+
+                        <button type="button" class="btn btn-info e-large" id="out" onclick="outTimeEnter()">Out
+                            Time
+                            Entry
                         </button>
                     </div>
+
                 </div>
 
+
             </div>
-            <div class="col-md-6 col-12">
-                <div class="row">
-                    {% for profile in profile %}
-                        <div class="idcard-front pl-2">
-                            <div class="desc">Indian Space Research Organisation</div>
-                            <div class="desc"><b>RRSC-WEST Visitor's Pass</b></div>
-                            {% if profile.photo %}
-                                <div>
-                                    <img class="desc" src="{{ profile.photo.url }}"
-                                         style="height: 120px; width: 120px;  float: right; margin: 10px 30px;">
-                                </div>
-                            {% else %}
-                                <div class="mr-3">
-                                    <canvas id="snapshot" width="130px" height="130px"
-                                            style="float: right; width:130px; height:130px;"></canvas>
-                                    <input type="number" hidden id='pk' value={{ profile.id }}>
-                                </div>
-                            {% endif %}
-                            <p class="" id="name"><b>Name : </b>{{ profile.name }}</p>
-                            <p class=""><b>Phone : </b>{{ profile.phone }}</p>
-                            {% for schedule in schedule %}
-                                <p hidden id="id">{{ schedule.id }}</p>
-                                <p hidden id="visitor">{{ schedule.visitor_id_id }}</p>
-                                <p class=""><b>Purpose : </b> {{ schedule.purpose }}</p>
-                                <p class=""><b>Allowed Devices : </b> {{ schedule.allowed_devices }}</p>
-                                <hr>
-                                <div id="qrcode" style="float: right; margin: 10px 20px ;"></div>
-                                <b>In-Time : </b>
-                                <p class="" id="in_time">{{ schedule.in_time }}</p>
-                                <b>Out-Time : </b>
-                                <p class="" id="out_time">{{ schedule.out_time }}</p>
-                                <p><b>No. of Days : </b>{{ schedule.allowed_days }}</p>
-                                <p><b>Address : </b>{{ profile.address }}</p>
-                                <p><b>City : </b>{{ profile.city }}</p>
-                            {% endfor %}
+
+            <div class="col-lg-6 col-md-6 mt-5 print" style="height: 680px; padding-left: 53px;">
+                {% for profile in profile %}
+                    <div class="idcard-front pl-2">
+
+                        <div class="desc mt-3">
+                            <img class="float-left ml-4" src="{% static 'bootstrap/img/logo.png' %}"
+                                 style="width: 50px; height: 50px;">
+                            <p>Indian Space Research
+                                Organisation<br>
+                                <b>RRSC-WEST Visitor's Pass</b>
+                            </p>
                         </div>
-                    {% endfor %}
-                </div>
-
-
+                        {% if profile.photo %}
+                            <div>
+                                <img class="desc" src="{{ profile.photo.url }}"
+                                     style="height: 120px; width: 120px;  float: right; margin: 10px 30px;">
+                            </div>
+                        {% else %}
+                            <div class="mr-3">
+                                <canvas id="snapshot" width="130px" height="130px"
+                                        style="float: right; width:130px; height:130px;"></canvas>
+                                <input type="number" hidden id='pk' value={{ profile.id }}>
+                            </div>
+                        {% endif %}
+                        <p class="" id="name"><b>Name : </b>{{ profile.name }}</p>
+                        <p class=""><b>Phone : </b>{{ profile.phone }}</p>
+                        {% for schedule in schedule %}
+                            <p hidden id="id">{{ schedule.id }}</p>
+                            <p hidden id="visitor">{{ schedule.visitor_id_id }}</p>
+                            <p class=""><b>Meeting Person : </b> {{ schedule.requested_by.get_full_name }}</p>
+                            <p class=""><b>Purpose : </b> {{ schedule.purpose }}</p>
+                            <p class=""><b>Allowed Devices : </b> {{ schedule.allowed_devices }}</p>
+                            <p class=""><b>Meeting Place : </b> {{ schedule.meeting_place }}</p>
+                            <hr>
+                            <div id="qrcode" style="float: right; margin: 10px 20px ;"></div>
+                            <b>Scheduled In-Time : </b>
+                            <p class="" id="in_time">{{ schedule.in_time }}</p>
+                            <b>Scheduled Out-Time : </b>
+                            <p class="" id="out_time">{{ schedule.out_time }}</p>
+                            <p><b>Allowed Day(s) : </b>{{ schedule.allowed_days }}</p>
+                            <p><b>Address : </b>{{ profile.address }}</p>
+                            <br>
+                            <br>
+                            <p class="float-left">Signature guard</p>
+                            <p class="float-right mr-2">Signature Visitor</p>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
             </div>
-        </div>
-        <div class="row">
-            <div class="noprint">
-                <button type="button" class="genric-btn success e-large circle" style="width: 400px;" id="qr"
-                        onclick="showqr()">View-QR
-                </button>
-                <p></p>
-                <button type="button" class="genric-btn success e-large circle" style="width: 400px;"
-                        onclick="window.print()">Print
-                </button>
-                <button type="button" class="noprint" id="enter" onclick="inTimeEnter()">In Time Entry</button>
-                <button type="button" class="noprint" id="out" onclick="outTimeEnter()">Out Time Entry</button>
-            </div>
-        </div>
 
+        </div>
     </div>
+
 
 {% endblock %}
 
@@ -138,6 +184,10 @@
 
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
     <script>
+
+        $(document).ready(function () {
+            document.getElementById("qr").click();
+        });
         const vid = document.querySelector('video');
         navigator.mediaDevices.getUserMedia({video: true}) // request cam
             .then(stream => {
@@ -157,7 +207,7 @@
                     pk = pk.value;
                     $.ajax({
                         type: "POST",
-                        url: "/user/home/guard_homepage/",
+                        url: "/user/guard/",
                         data: {
                             photo: snap,
                             pk: pk,
@@ -190,8 +240,6 @@
 
 
         function showqr() {
-            var btn = document.getElementById('qr');
-            btn.hidden = true;
             var data = document.getElementById('visitor').innerHTML;
             var qrcode = new QRCode(document.getElementById("qrcode"), {
                 text: data,
@@ -239,8 +287,7 @@
                             csrfmiddlewaretoken: '{{ csrf_token }}',
                         },
                     });
-            }
-            else {
+            } else {
                 var schedule = document.getElementById('in_time').innerHTML;
                 alert('You are scheduled for' + ' ' + schedule);
             }

@@ -85,6 +85,7 @@
 
                                     <div class="col-md-6 col-6">
                                         {% if field.label == 'In time' %}
+
                                             <div class="form-inline">
                                                 <!--Date:--><input autocomplete="off" type="text" name="in_time_0"
                                                                    placeholder="YY-MM-DD"
@@ -93,8 +94,10 @@
                                                                    id="id_in_date">
 
 
-                                                <input hidden type="text" name="in_time"
-                                                       placeholder="In time" required="" id="id_in_time">
+                                                <input hidden type="text" name="in_time" class="form-control"
+                                                       placeholder="In time" value="{{ field.value }}" required="" id="id_in_time">
+
+                                            Schedule: {{ field.value }}
 
                                             </div>
 
@@ -109,7 +112,6 @@
                                                 In Time:<input type="time" name="in_time_1"
                                                                class="vTimeField form-control mr-2"
                                                                size="8" placeholder="HH:MM:SS" required id="in_time">
-
                                                 Out Time:<input type="time" name="in_time_1"
                                                                 class="vTimeField form-control"
                                                                 size="8" placeholder="HH:MM:SS" required id="out_time">

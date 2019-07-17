@@ -22,6 +22,10 @@
             padding: 10px;
         }
 
+        .genric-btn {
+            min-width: 250px;
+            background: #4b6d71 !important;
+        }
     </style>
 {% endblock %}
 
@@ -57,18 +61,23 @@
         </div>
 
 
-        <div class="col-md-6 col-lg-6 mt-5">
+        <div class="col-md-6 col-lg-6 mt-5 text-center">
+            <div class="container">
+                
 
-            <div><a href="{% url 'visitor:my_schedules' %}">My Schedules</a>
+                <a href="{% url 'visitor:my_schedules' %}" class="genric-btn success circle arrow mt-5">Upcoming Visits<i
+                        class="fa fa-home ml-2"></i></a>
+
+                <a href="{% url 'visitor:past_visitor' %}" class="genric-btn success circle arrow mt-3">Past
+                    Visitors <i class="fa fa-bar-chart ml-2"></i></a>
+
+                <a href="{% url 'visitor:schedule' %}" class="genric-btn success circle arrow mt-3"> Schedule new
+                    Visit <i class="fa fa-file-text-o ml-2"></i></a>
+
+                <a href="{% url 'visitor:update_visitor' %}" class="genric-btn success circle arrow mt-3">Add Visitor <i
+                        class="fa fa-plus-square-o ml-2"></i></a>
             </div>
-            <div><a href="{% url 'visitor:past_visitor' %}">Past
-                Visitors</a>
-            </div>
-            <div><a href="{% url 'visitor:schedule' %}"> Schedule new
-                Visit</a>
-            </div>
-            <div><a href="{% url 'visitor:update_visitor' %}">Add Visitor</a>
-            </div>
+
         </div>
 
         <div class=" col-md-3 col-lg-3 card text-black card-color">
@@ -76,7 +85,7 @@
             <div class="card-body pre-scrollable">
                 {% for vr in upcoming_visitor %}
                     <dl>
-                        <dt>Id: {{ vr.visitor_id }}</dt>
+                        <dt>Name:<a href="{% url 'visitor:schedule_edit' sch_id=vr.id %}">{{ vr.visitor_id }}</a></dt>
                         <dd>Purpose: {{ vr.purpose }}</dd>
                     </dl>
                 {% endfor %}
