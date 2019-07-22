@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
-from .models import Profile, Schedule, Visitor
+from .models import Profile, Schedule, Visitor, AllowedDevices
 from django.core.exceptions import ValidationError
 
 
@@ -59,7 +59,13 @@ class UpdateVisitorForm(forms.ModelForm):
         exclude = ['photo']
 
 
-class VisitorEntryForm:
+class VisitorEntryForm(forms.ModelForm):
     class Meta:
         model = Visitor
         fields = ['name', 'phone', 'gender', 'designation', 'photo']
+
+
+class AllowedDevicesForm(forms.ModelForm):
+    class Meta:
+        model = AllowedDevices
+        exclude = [""]

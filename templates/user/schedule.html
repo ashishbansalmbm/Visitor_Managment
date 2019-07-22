@@ -60,7 +60,8 @@
             {% csrf_token %}
             {% if flag == 1 %}
                 <p>Schedule has been created Successfully!</p>
-                <a href="{% url 'visitor:schedule' %}">Add New Schedule</a>
+                <a href="{% url 'visitor:schedule' %}">Add New Schedule</a> <br>
+                <a href="{% url 'visitor:allowed_devices' %}">Allow devices</a>
             {% else %}
 
                 {% for field in schedule_form %}
@@ -86,18 +87,19 @@
                                     <div class="col-md-6 col-6">
                                         {% if field.label == 'In time' %}
 
+
                                             <div class="form-inline">
                                                 <!--Date:--><input autocomplete="off" type="text" name="in_time_0"
-                                                                   placeholder="YY-MM-DD"
+                                                                   placeholder="YYYY-MM-DD" value="{{ field.value.year }}-{{ field.value.month }}-{{ field.value.day }}"
                                                                    class="vDateField form-control mr-2" size="10"
-                                                                   required
                                                                    id="id_in_date">
 
 
                                                 <input hidden type="text" name="in_time" class="form-control"
-                                                       placeholder="In time" value="{{ field.value }}" required="" id="id_in_time">
+                                                       placeholder="In time" value="{{ field.value }}"
+                                                       id="id_in_time">
 
-                                            Schedule: {{ field.value }}
+                                                Schedule: {{ field.value }}
 
                                             </div>
 
@@ -106,29 +108,31 @@
                                                 <!--Date:--><input hidden autocomplete="off" type="text"
                                                                    placeholder="YY-MM-DD"
                                                                    class="vDateField form-control mr-2" size="10"
-                                                                   required
                                                                    id="id_out_date">
 
                                                 In Time:<input type="time" name="in_time_1"
                                                                class="vTimeField form-control mr-2"
-                                                               size="8" placeholder="HH:MM:SS" required id="in_time">
+                                                               size="8" placeholder="HH:MM:SS" required value="10:00"
+                                                               id="in_time">
                                                 Out Time:<input type="time" name="in_time_1"
                                                                 class="vTimeField form-control"
-                                                                size="8" placeholder="HH:MM:SS" required id="out_time">
+                                                                size="8" placeholder="HH:MM:SS" required value="17:00"
+                                                                id="out_time">
 
                                                 <input hidden type="text" name="out_time"
-                                                       placeholder="In time" required="" id="id_out_time">
+                                                       placeholder="In time"  value="{{ field.value }}"
+                                                       id="id_out_time">
 
                                             </div>
                                         {% elif field.label == 'Visitor id' %}
                                             {{ field }}
                                         {% elif field.label == 'Requested by' %}
-                                            {{ field }}
-
-
+                                            {{ request.user.get_full_name }}
                                         {% else %}
                                             {% render_field field placeholder=field.label class='single-input' %}
                                         {% endif %}
+
+
                                     </div>
 
                                     <div class=" col-3 col-md-3 col-lg-3 mt-2 " style="padding-left: 10px;">
@@ -147,22 +151,48 @@
                         </div>
                     </div>
                 {% endfor %}
+
+
                 <br>
                 <br>
+
+                <div class="row">
+                    <div class="col-md-2 col-2 text-capitalize mt-8 text-dark ">
+                        Allowed Devices:
+                    </div>
+                    <div class="col-4">
+                        {% for field in allowed_devices %}
+
+
+
+                            <div class="row">
+                                {{ field.device }} ({{ field.detail }}) <a class="ml-3"
+                                    href="{% url 'visitor:allowed_devices_update' id=field.id %}"> <i
+                                    class="fa fa-edit"></i> </a>
+
+                            <a class="ml-3"
+                                    href="{% url 'visitor:allowed_devices_delete' id=field.id %}"> <i
+                                    class="fa fa-remove"></i> </a>
+                            </div>
+
+                        {% endfor %}
+                    </div>
+                </div>
                 <div class="mt-10">
-                    <button type="submit" class="genric-btn success-border radius" style="margin-left: 150px">Update
+                    <button type="submit" class="genric-btn success-border radius" id="update" style="margin-left: 150px">Update
                     </button>
                 </div>
+
+
 
 
                 </form>
 
                 </div>
-
-
                 </div>
 
             {% endif %}
+
 
 {% endblock %}
 
@@ -172,12 +202,13 @@
     <script src="{% static 'custom/select.js' %}"></script>
     <script>
         $(function () {
-            $("#id_in_date").datepicker({dateFormat: 'yy-mm-dd'});
-            $("#id_out_date").datepicker({dateFormat: 'yy-mm-dd'});
+            $("#id_in_date").datepicker({dateFormat: 'yy-mm-dd', minDate : new Date()});
+            $("#id_out_date").datepicker({dateFormat: 'yy-mm-dd', minDate : new Date()});
 
         });
 
         function in_time() {
+
             var date = document.getElementById('id_in_date').value;
             var time = document.getElementById('in_time').value;
             document.getElementById('id_in_time').value = date + ' ' + time;
@@ -204,9 +235,13 @@
                 out_time();
             });
 
+
             $(function () {
                 $('select').selectize();
             });
+
+            in_time();
+            out_time();
 
         });
     </script>

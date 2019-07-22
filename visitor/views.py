@@ -7,8 +7,8 @@ from django.utils import six
 from django.core.files.base import ContentFile
 
 from .forms import RegistrationForm, UpdateUserForm, UpdateProfileFormVerified, UpdateProfileFormNotVerified, \
-    UpdateScheduleForm, UpdateVisitorForm
-from .models import Schedule, Visitor, Visit
+    UpdateScheduleForm, UpdateVisitorForm, AllowedDevicesForm
+from .models import Schedule, Visitor, Visit, AllowedDevices
 from django.utils import timezone
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.contrib.auth.decorators import user_passes_test
@@ -102,11 +102,14 @@ def schedule(request):
     if request.method == "POST":
         schedule_form = UpdateScheduleForm(request.POST)
         if schedule_form.is_valid():
-            schedule_form.save()
+            form = schedule_form.save(commit=False)
+            form.requested_by = request.user
+            form.save()
             flag = 1
             return render(request, 'user/schedule.html', {'flag': flag})
     else:
         schedule_form = UpdateScheduleForm()
+
     context = {'schedule_form': schedule_form}
     return render(request, 'user/schedule.html', context)
 
@@ -117,12 +120,21 @@ def schedule_edit(request, sch_id):
     if request.method == "POST":
         schedule_form = UpdateScheduleForm(request.POST)
         if schedule_form.is_valid():
-            schedule_form.save()
-            flag = 1
-            return render(request, 'user/schedule.html', {'flag': flag})
+            schedule = Schedule.objects.get(id=sch_id)
+            visitor = schedule_form.data['visitor_id']
+            schedule.visitor_id = Visitor.objects.get(id=visitor)
+            schedule.approve = False
+            schedule.purpose = schedule_form.data['purpose']
+            schedule.in_time = schedule_form.data['in_time']
+            schedule.out_time = schedule_form.data['out_time']
+            schedule.allowed_days = schedule_form.data['allowed_days']
+            schedule.meeting_place = schedule_form.data['meeting_place']
+            schedule.save()
+            return redirect('visitor:my_schedules')
     else:
         schedule_form = UpdateScheduleForm(instance=Schedule.objects.get(pk=sch_id))
-    context = {'schedule_form': schedule_form}
+    allowed_devices = AllowedDevices.objects.filter(schedule_id=sch_id)
+    context = {'schedule_form': schedule_form, 'allowed_devices': allowed_devices}
     return render(request, 'user/schedule.html', context)
 
 
@@ -173,7 +185,8 @@ def guard_homepage(request):
                 idn = profile[0].id
 
                 schedul = Schedule.objects.raw(
-                    'select * from visitor_Schedule where  approve=1 and visitor_id_id=%s and julianday(current_timestamp) - julianday(in_time) < allowed_days and date(in_time)<= CURRENT_DATE order by in_time desc',[idn])
+                    'select * from visitor_Schedule where  approve=1 and entry_prohibition=0 and visitor_id_id=%s and julianday(current_timestamp) - julianday(in_time) < allowed_days and date(in_time)<= CURRENT_DATE order by in_time desc',
+                    [idn])
                 temp = 0;
                 if not schedul:
                     return HttpResponse('<p>You are not Scheduled for today!</p>'
@@ -193,7 +206,8 @@ def guard_homepage(request):
                 profile.save()
                 return render(request, 'home/visitor_profile.html')
 
-    user = Schedule.objects.raw('select * from visitor_Schedule where approve=1 and julianday(current_timestamp) - julianday(in_time) < allowed_days and date(in_time)<= CURRENT_DATE  order by in_time desc')
+    user = Schedule.objects.raw(
+        'select * from visitor_Schedule where approve=1 and entry_prohibition=0 and julianday(current_timestamp) - julianday(in_time) < allowed_days and date(in_time)<= CURRENT_DATE  order by in_time desc')
     visitor = Visit.objects.raw(
         'select * from visitor_Visit where in_time < current_timestamp and out_time = in_time order by in_time desc')
     return render(request, 'home/guard_homepage.html', {'user': user, 'visitor': visitor})
@@ -204,7 +218,7 @@ def guard_homepage(request):
 def visitor_profile(request, id):
     profile = Visitor.objects.raw("select * from visitor_Visitor where id = %s", [id])
     schedul = Schedule.objects.raw(
-        'select * from visitor_Schedule where  approve=1 and visitor_id_id=%s and in_time > current_timestamp ',
+        'select * from visitor_Schedule where  approve=1 and entry_prohibition=0 and visitor_id_id=%s and julianday(current_timestamp) - julianday(in_time) < allowed_days and date(in_time)<= CURRENT_DATE order by in_time desc',
         [id])
     temp = 0;
     if not schedul:
@@ -234,7 +248,7 @@ def visitor_profile_out(request, id):
 def dashboard(request):
     user = request.user.id
     upcoming_visitor = Schedule.objects.raw(
-        'select * from visitor_Schedule where out_time >current_timestamp  and approve=1 and requested_by_id = %s',
+        'select * from visitor_Schedule where out_time >current_timestamp  and approve=1 and entry_prohibition=0 and requested_by_id = %s',
         [user])
     context = {'user': user, 'profile': request.user.profile,
                'upcoming_visitor': upcoming_visitor}
@@ -288,3 +302,60 @@ def out_time_enter(request):
         data.out_time = timezone.now()
         data.save()
         return render(request, 'home/visitor_profile.html')
+
+
+@login_required
+@group_required('Scientist')
+def schedule_disapprove(request, id):
+    if request.method == 'GET':
+        schedule = Schedule.objects.get(id=id)
+        if schedule.entry_prohibition:
+            schedule.entry_prohibition = False
+        else:
+            schedule.entry_prohibition = True
+        schedule.save()
+        return redirect('visitor:my_schedules')
+
+
+@login_required
+@group_required('Scientist')
+def allowed_devices(request):
+    if request.method == "POST":
+        allowed_form = AllowedDevicesForm(request.POST)
+        if allowed_form.is_valid():
+            allowed_form.save()
+            flag = 1;
+            return render(request, 'user/allowed_devices.html', {'flag': flag})
+    else:
+        allowed_form = AllowedDevicesForm()
+    context = {'allowed_form': allowed_form}
+    return render(request, 'user/allowed_devices.html', context)
+
+
+@login_required
+@group_required('Scientist')
+def allowed_devices_update(request, id):
+    if request.method == "POST":
+        allowed_form = AllowedDevicesForm(request.POST)
+        if allowed_form.is_valid():
+            device = AllowedDevices.objects.get(id=id)
+            schedule_id = device.schedule.id
+            device.device = allowed_form.data['device']
+            device.detail = allowed_form.data['detail']
+            device.save()
+            return redirect('/user/my/schedules/' + str(schedule_id))
+    else:
+        device = AllowedDevices.objects.get(id=id)
+        allowed_form = AllowedDevicesForm(instance=device)
+        context = {'allowed_form': allowed_form}
+        return render(request, 'user/allowed_devices.html', context)
+
+
+@login_required
+@group_required('Scientist')
+def allowed_devices_delete(request, id):
+    if request.method == "GET":
+        device = AllowedDevices.objects.get(id=id)
+        schedule_id = device.schedule.id
+        device.delete()
+        return redirect('/user/my/schedules/' + str(schedule_id))

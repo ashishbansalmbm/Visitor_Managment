@@ -65,7 +65,6 @@ class ScheduleAdmin(ImportExportModelAdmin):
     list_display = ['visitor_id',
                     'requested_by',
                     'purpose',
-                    'allowed_devices',
                     'in_time',
                     'out_time',
                     'allowed_days', 'approve', ]

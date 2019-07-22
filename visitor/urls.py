@@ -20,8 +20,13 @@ urlpatterns = [
     path('scan/qr/', views.scan_qr, name="scan-qr"),
     path('my/schedules/', views.my_schedule, name='my_schedules'),
     re_path(r'^my/schedules/(?P<sch_id>\d+)/', views.schedule_edit, name='schedule_edit'),
+    path('delete/schedule/<int:id>/', views.schedule_disapprove, name='schedule_disapprove'),
     path('in/time/enter/', views.in_time_enter),
     path('out/time/enter/', views.out_time_enter),
+    path('allowed_devices/', views.allowed_devices, name="allowed_devices"),
+    path('allowed_devices/<int:id>/', views.allowed_devices_update, name="allowed_devices_update"),
+    path('allowed_devices/remove/<int:id>/', views.allowed_devices_delete, name="allowed_devices_delete"),
+
     # re_path(r'^profile/(?P<pk>\d+)/' ,views.visitor_profile, name="visitor_profile"),
     # path('home/view/',views.html_to_pdf_view,name="html_to_pdf_view"),
 ]

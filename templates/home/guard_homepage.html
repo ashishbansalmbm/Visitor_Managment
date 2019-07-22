@@ -21,6 +21,8 @@
 
 <header id="header" class="noprint">
 
+<div id="google_translate_element"></div>
+
     <div class="text-right container">
 
         {% if request.user.is_authenticated %}
@@ -84,8 +86,8 @@
             <div class="card-body pre-scrollable">
                 {% for vr in user %}
                     <dl>
-                        <dt class="text-capitalize"><a href="{% url 'visitor:visitor_profile' id=vr.visitor_id.id %}">{{ vr.visitor_id.id }}  - {{ vr.visitor_id.name }}</a></dt>
-                        <dd> {{ vr.in_time }}</dd>
+                        <dt class="text-capitalize"><a href="{% url 'visitor:visitor_profile' id=vr.visitor_id.id %}">ISRO{{ vr.visitor_id.id }}  - {{ vr.visitor_id.name }}</a></dt>
+                        <dd> {{ vr.in_time.time }} - {{ vr.requested_by.get_full_name }}</dd>
                     </dl>
                 {% endfor %}
             </div>
@@ -114,7 +116,7 @@
                         <br>
 
                         <button class="btn btn-lg btn-success btn-block text-uppercase" type="submit" name="action"
-                                value="Send">VERIFY
+                                value="Send">OK
                         </button>
 
                         <a class="btn btn-lg btn-primary btn-block text-uppercase mt-3" href="{% url 'visitor:scan-qr' %}">Scan
@@ -169,6 +171,14 @@
         crossorigin="anonymous"></script>
 <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
 <script type="text/javascript" src={% static 'qrcode/qrcode.js' %}></script>
+
+<script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
+}
+</script>
+
+<script type="text/javascript" src="{% static 'custom/translate.js' %}"></script>
 
 
 </html>
