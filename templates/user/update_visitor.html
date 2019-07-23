@@ -10,14 +10,7 @@
             background:#f9f9ff;!important;
             font-family: "Poppins", sans-serif;!important;
     }
-      input {
-            border:none;!important;
-            background:#f9f9ff;!important;
-            font-family: "Poppins", sans-serif;!important;
-        }
-        input:focus{
-            outline: none;
-        }
+
 
         select {
             display: inline-flex;
@@ -60,8 +53,12 @@
                                         {{ field.label_tag }}
                                     </div>
 
-                                    <div class="col-md-6 col-lg-6 single-input">
-                                        {% render_field field class="form-control" placeholder=field.label %}
+                                    <div class="col-md-6 col-lg-6 ">
+                                        {% if field.label == 'Address' %}
+                                        {% render_field field class="single-textarea" placeholder=field.label %}
+                                        {% else %}
+                                        {% render_field field class="single-input" placeholder=field.label %}
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
@@ -69,8 +66,8 @@
                     </div>
                 {% endfor %}
 
-                <div class="mt-10">
-                    <button type="submit" class="genric-btn success-border radius" style="margin-left: 150px">Update
+                <div class="mt-10 text-center">
+                    <button type="submit" class="genric-btn success-border radius" style="margin-right: 26px">Update
                     </button>
                 </div>
             </form>

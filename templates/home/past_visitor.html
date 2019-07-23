@@ -1,74 +1,102 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}
-    <title>Past Visitors</title>
-    <style>
-table {
-  border-collapse: collapse;
-  border-spacing: 1px;
-  width: 100%;
-  border: 5px solid #ddd;
-}
+<title>Past Visitors</title>
+<style>
+        table {
+            border-collapse: collapse;
+            border-spacing: 1px;
+            width: 100%;
+            border: 5px solid #ddd;
+        }
 
-th, td {
-  text-align: left;
-  padding: 8px;
-}
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
 
-tr:nth-child(even){background-color: #f2f2f2}
-    .bg-info{
-        background-color: #4cd3e3 !important;
-    }
+        tr:nth-child(even) {
+            background-color: #f2f2f2
+        }
+
+        .bg-info {
+
+            background-color: rgba(0, 123, 255, 0.25) !important;
+        }
+
+        ul {
+            margin-bottom: 1rem !important;
+        }
+
 </style>
 {% endblock %}
 
 {% block body %}
-    <br>
+<br>
 
 
-    <center><h1> Past Visitors </h1></center>
-    <br>
-    <div style="overflow-x:auto;">
+<h1 class="text-center"> Past Visitors </h1>
+<br>
+<div style="overflow-x:auto;">
 
-        <table class="table">
-    <tr>
-          <thead class="bg-info">
-      <th> Name</th>
-      <th>Purpose</th>
-      <th>Allowed Device</th>
-      <th>In- Time</th>
-      <th>Out- Time</th>
-      <th>Allowed Days</th>
-      <th>Meeting Place</th>
-      <th>Phone</th>
-      <th>E-mail</th>
-      <th>Designation</th>
-      <th>Photo</th>
-          </thead>
-    </tr>
-  {% for vr in past_visitors %}
+    <table class="table">
         <tr>
-      <td>{{ vr.visitor_id }}</td>
-      <td>{{ vr.purpose }}</td>
-      <td>{{ vr.allowed_devices }}</td>
-      <td>{{ vr.in_time }}</td>
-      <td>{{ vr.out_time }}</td>
-      <td>{{ vr.allowed_days }}</td>
-      <td>{{ vr.meeting_place }}</td>
-      <td>{{ vr.phone }}</td>
-      <td>{{ vr.email }}</td>
-      <td>{{ vr.designation }}</td>
-            <td>{% if vr.photo %} <a href="/media/{{ vr.photo }}" class="img-pop-up"><img src="/media/{{ vr.photo }}" style="width:90px; height: 100px;" /></a>{% endif %}</td>
+            <thead class="bg-info">
+            <th> Name</th>
+            <th>Purpose</th>
+            <th>Allowed Device</th>
+            <th>In- Time</th>
+            <th>Out- Time</th>
+            <th>Allowed Days</th>
+            <th>Meeting Place</th>
+            <th>Phone</th>
+            <th>E-mail</th>
+            <th>Designation</th>
+            <th>Photo</th>
+            </thead>
+        </tr>
+        {% for vr in past_visitors %}
+        <tr>
+            <td><a href="{% url 'visitor:schedule_edit' sch_id=vr.id %}">{{ vr.visitor_id }}</a></td>
+            <td>{{ vr.purpose }}</td>
+            <td>{{ vr.allowed_devices }}</td>
+            <td>{{ vr.in_time }}</td>
+            <td>{{ vr.out_time }}</td>
+            <td>{{ vr.allowed_days }}</td>
+            <td>{{ vr.meeting_place }}</td>
+            <td>{{ vr.phone }}</td>
+            <td>{{ vr.email }}</td>
+            <td>{{ vr.designation }}</td>
+            <td>{% if vr.photo %}
+                <a href="/media/{{ vr.photo }}" class="img-pop-up"><img src="/media/{{ vr.photo }}"
+                                                                        style="width:90px; height: 100px;"/></a>
+            </td>
+            {% endif %}
 
-         {% endfor %}
-        </table>
 
-{#    <div class="container">#}
-{#       #}
-{#            {% if vr.photo %}#}
-{#                <div class="col-md-4 float-right">#}
-{#                    <a href="{{ vr.photo.url }}" class="img-pop-up">#}
-{#                            <div class=" single-gallery-image "#}
-{#                                 style="height:330px;background: url({{ vr.photo.url}});"></div>#}
-{#{% endif %}#}
-{% endblock %}
+            {% endfor %}
+    </table>
+    {% if past_visitors.has_other_pages %}
+    <ul class="pagination">
+        {% if past_visitors.has_previous %}
+        <li><a href="?page={{ past_visitors.previous_page_number }}">&laquo;</a></li>
+        {% else %}
+        <li class="disabled"><span>&laquo;</span></li>
+        {% endif %}
+        {% for i in past_visitors.paginator.page_range %}
+        {% if past_visitors.number == i %}
+        <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+        {% else %}
+        <li><a href="?page={{ i }}">{{ i }}</a></li>
+        {% endif %}
+        {% endfor %}
+        {% if past_visitors.has_next %}
+        <li><a href="?page={{ past_visitors.next_page_number }}">&raquo;</a></li>
+        {% else %}
+        <li class="disabled"><span>&raquo;</span></li>
+        {% endif %}
+    </ul>
+    {% endif %}
+
+    {% endblock %}
+

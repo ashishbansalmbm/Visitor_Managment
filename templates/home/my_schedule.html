@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+<title>Past Visitors</title>
+<style>
+
+
+        .bg-info {
+            background-color: rgba(0, 123, 255, 0.25) !important;
+        }
+
+
+        #myTable {
+            border-collapse: collapse; /* Collapse borders */
+            width: 100%; /* Full-width */
+            border: 1px solid #ddd; /* Add a grey border */
+        }
+
+        #myTable th, #myTable td {
+            text-align: left; /* Left-align text */
+            padding: 12px; /* Add padding */
+        }
+
+        #myTable tr {
+            /* Add a bottom border to all table rows */
+            border-bottom: 1px solid #ddd;
+        }
+
+        #myTable tr.header, #myTable tr:hover {
+            /* Add a grey background color to the table header and on hover */
+            background-color: #f1f1f1;
+        }
+
+        .less-width {
+            width: 120px;
+            font-size: 2px;
+        }
+
+        input {
+            font-size: 14px !important;
+        }
+
+
+
+</style>
+{% endblock %}
+
+{% block body %}
+<br>
+
+
+<h1 class="text-center"> My schedules</h1>
+<br>
+
+
+<div style="overflow-x:auto;">
+
+
+    <table class="table table-striped" id="myTable">
+        <tr class="header">
+            <thead class="bg-info">
+            <th class="less-width"><input type="text" class="form-control" id="id" onkeyup="search(0,'id')"
+                                          placeholder="ID"></th>
+            <th class="less-width"><input type="text" class="form-control" id="name" onkeyup="search(1, 'name')"
+                                          placeholder="Name"></th>
+            <th>Purpose</th>
+            <th>Allowed Device</th>
+            <th class="less-width"><input type="text" class="form-control" id="date" onkeyup="search(4, 'date')"
+                                          placeholder="Start Date"></th>
+            <th>In- Time</th>
+            <th>Out- Time</th>
+            <th>Allowed Days</th>
+
+            <th>Meeting Place</th>
+            <th>Allowed Status</th>
+            <th>Prohibited</th>
+
+            <th>Edit</th>
+            </thead>
+        </tr>
+        {% for vr in my_schedule %}
+        <tr>
+            <td>ISRO{{ vr.visitor_id.id }}</td>
+            <td>{{ vr.visitor_id.name }}</td>
+            <td>{{ vr.purpose }}</td>
+            <td>{{ vr.allowed_devices }}</td>
+            <td>{{ vr.in_time.date }}</td>
+            <td>{{ vr.in_time.time }}</td>
+            <td>{{ vr.out_time.time }}</td>
+            <td>{{ vr.allowed_days }}</td>
+            <td>{{ vr.meeting_place }}</td>
+            {% if vr.approve == True %}
+            <td>Approved</td>
+            {% else %}
+            <td>Pending Approval</td>
+            {% endif %}
+            {% if vr.entry_prohibition == True %}
+            <td>
+
+                <a href="{% url 'visitor:schedule_disapprove' id=vr.id %}" class="ml-2"
+                   style="color: indianred"><i class="fa fa-toggle-on"></i></a>
+
+            </td>
+            {% else %}
+            <td>
+                <a class="primary-switch" href="{% url 'visitor:schedule_disapprove' id=vr.id %}" class="ml-2"
+                   style="color: green"><i class="fa fa-toggle-off"></i></a>
+            </td>
+            {% endif %}
+            <td>
+                <a href="{% url 'visitor:schedule_edit' sch_id=vr.id %}"><i class="fa fa-edit"></i> </a>
+            </td>
+
+        </tr>
+        {% endfor %}
+    </table>
+    {% if my_schedule.has_other_pages %}
+    <ul class="pagination">
+        {% if my_schedule.has_previous %}
+        <li><a href="?page={{ my_schedule.previous_page_number }}">&laquo;</a></li>
+        {% else %}
+        <li class="disabled"><span>&laquo;</span></li>
+        {% endif %}
+        {% for i in my_schedule.paginator.page_range %}
+        {% if users.number == i %}
+        <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+        {% else %}
+        <li><a href="?page={{ i }}">{{ i }}</a></li>
+        {% endif %}
+        {% endfor %}
+        {% if users.has_next %}
+        <li><a href="?page={{ users.next_page_number }}">&raquo;</a></li>
+        {% else %}
+        <li class="disabled"><span>&raquo;</span></li>
+        {% endif %}
+    </ul>
+    {% endif %}
+
+    {% endblock %}
+
+    {% block script %}
+    <script>
+        function search(n, id) {
+            // Declare variables
+            var input, filter, table, tr, td, i, txtValue;
+            input = document.getElementById(id);
+            filter = input.value.toUpperCase();
+            table = document.getElementById("myTable");
+            tr = table.getElementsByTagName("tr");
+
+            // Loop through all table rows, and hide those who don't match the search query
+            for (i = 0; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[n];
+                if (td) {
+                    txtValue = td.textContent || td.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+
+
+    </script>
+
+    {% endblock %}

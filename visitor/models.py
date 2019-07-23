@@ -52,10 +52,12 @@ class Visitor(models.Model):
     phone = models.CharField(max_length=15)
     gender = models.CharField(max_length=5, choices=[(tag.name, tag.value) for tag in Gender], default='')
     designation = models.CharField(max_length=15, null=True, blank=True)
+    organisation = models.CharField(max_length=15, null=True, blank=True)
     email = models.EmailField(max_length=254, null=True, blank=True)
     address = models.TextField(blank=True, null=True)
     profile_creation_time = models.DateTimeField(auto_now_add=True)
     photo = models.ImageField(upload_to='visitors', blank=True, null=True)
+    entry_check = models.BooleanField(default=0, blank=True)
 
     def __str__(self):
         return self.name
@@ -63,19 +65,18 @@ class Visitor(models.Model):
 
 class Schedule(models.Model):
     visitor_id = models.ForeignKey(Visitor, on_delete=models.SET_NULL, null=True)
-    approve = models.BooleanField(default=False)
-    requested_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+
+    requested_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     purpose = models.CharField(max_length=500, blank=True, null=True)
-    allowed_devices = models.CharField(max_length=250, blank=True, null=True)
-    in_time = models.DateTimeField(default=timezone.now)
-    out_time = models.DateTimeField(default=timezone.now)
-    allowed_days = models.DurationField()
+    in_time = models.DateTimeField(default=timezone.now, blank=True,)
+    out_time = models.DateTimeField(default=timezone.now, blank=True,)
+    allowed_days = models.PositiveIntegerField()
     meeting_place = models.CharField(max_length=100, blank=True, null=True)
+    approve = models.BooleanField(default=False)
+    entry_prohibition = models.BooleanField(default=False)
 
     def __str__(self):
-        return str(self.visitor_id) + ' (In_time) ' + str(self.in_time.date()) + '  ' + str(
-            self.in_time.time()) + ' (duration) ' \
-               + str(self.allowed_days)
+        return str(self.visitor_id.name) + ' (In_time : ' + str(self.in_time.date()) + ' ) '
 
 
 class Visit(models.Model):
@@ -86,6 +87,6 @@ class Visit(models.Model):
 
 
 class AllowedDevices(models.Model):
-    visit_id = models.ForeignKey(Visit, on_delete=models.SET_NULL, null=True)
+    schedule = models.ForeignKey(Schedule, on_delete=models.SET_NULL, null=True)
     device = models.CharField(max_length=250)
     detail = models.TextField()
