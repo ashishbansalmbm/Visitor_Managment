@@ -87,7 +87,7 @@
                 {% for vr in user %}
                     <dl>
                         <dt class="text-capitalize"><a href="{% url 'visitor:visitor_profile' id=vr.visitor_id.id %}">ISRO{{ vr.visitor_id.id }}  - {{ vr.visitor_id.name }}</a></dt>
-                        <dd> {{ vr.in_time.time }} - {{ vr.requested_by.get_full_name }}</dd>
+                        <dd> {{ vr.in_time }} - {{ vr.requested_by.get_full_name }}</dd>
                     </dl>
                 {% endfor %}
             </div>
