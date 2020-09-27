@@ -2,7 +2,7 @@
 A Simple tool to keep track of Visitor's In and Out Time
 
 ## Install Dependencies 
-```pip install -r reruierments.txt```
+```pip install -r requierments.txt```
 
 ## For new database
 ```python managy.py makemigrations```
